@@ -23,6 +23,6 @@ class MasterLayout extends Component
      */
     public function render()
     {
-        return view('components.master-layout');
+        return view('layouts.master');
     }
 }
