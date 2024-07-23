@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="csrf-token" content="{{ csrf_token() }}">
 
 		<title>Invoice Cepat Sehat</title>
 		{{-- icons --}}
@@ -22,6 +23,9 @@
 
 		{{-- custom --}}
 		<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" />
+		<link rel="stylesheet" href="{{ asset('assets/css/css.css') }}" />
+
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.3/dist/sweetalert2.all.min.js"></script>
 	</head>
 	<body>
 		<div class="content">
@@ -29,9 +33,11 @@
 		</div>
 
 		<script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-		<script src="{{ asset('https://code.jquery.com/jquery-3.6.0.min.js') }}"></script>
+		<script src="{{ asset('https://code.jquery.com/jquery-3.7.0.min.js') }}"></script>
 		<script src="{{ asset('assets/js/swiper-bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
+		<script src="{{ asset('assets/js/jquery-validation/dist/jquery.validate.min.js')}}"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.3/dist/sweetalert2.all.min.js"></script>
 	</body>
 </html>
 
