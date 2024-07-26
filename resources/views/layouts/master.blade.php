@@ -23,9 +23,11 @@
 
 		{{-- custom --}}
 		<link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" />
-		<link rel="stylesheet" href="{{ asset('assets/css/css.css') }}" />
 
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.3/dist/sweetalert2.all.min.js"></script>
+		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
+		<link rel="stylesheet" href="{{ asset('assets/css/css.css') }}" />
 	</head>
 	<body>
 		<div class="content">
@@ -33,11 +35,12 @@
 		</div>
 
 		<script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-		<script src="{{ asset('https://code.jquery.com/jquery-3.7.0.min.js') }}"></script>
+		<script src="{{ asset('https://code.jquery.com/jquery-3.6.0.min.js') }}"></script>
 		<script src="{{ asset('assets/js/swiper-bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/js/main.js') }}"></script>
 		<script src="{{ asset('assets/js/jquery-validation/dist/jquery.validate.min.js')}}"></script>
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.3/dist/sweetalert2.all.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{{ asset('assets/js/main.js') }}"></script>
 	</body>
 </html>
 
