@@ -15,3 +15,6 @@ Route::middleware('guest:web')->group(function () {
 Route::get('/', [InvoiceController::class, 'view_invoice'])->name('view_invoice')->middleware("auth");
 Route::get('/new-invoice', [InvoiceController::class, 'newInvoice'])->name('view_new_invoice')->middleware("auth");
 
+Route::post('/new-invoice', [InvoiceController::class, 'createNewInvoice'])->name('post_new_invoice')->middleware("auth");
+
+
