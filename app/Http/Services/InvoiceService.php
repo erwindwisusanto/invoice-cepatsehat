@@ -29,8 +29,8 @@ class InvoiceService
 		$username = $form['username'] ?? null;
     $address 	= $form['address'] ?? null;
     $phoneNumber = $form['phone_number'] ?? null;
-    $complimentaryDiscount = $form['complimentary_discount'] ?? null;
-    $medicalTeamTransportCost = $form['medical_team_transport_cost'] ?? null;
+    $complimentaryDiscount = !empty($form['complimentary_discount']) ? $form['complimentary_discount'] : 0;
+    $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? $form['medical_team_transport_cost'] : 0;
     $invoiceNumber = $form['invoice_number'] ?? null;
 
 		$payment_methods = [];
@@ -112,5 +112,15 @@ class InvoiceService
 		}
 
 		return $newNumber;
+	}
+
+	public function GetInvoices()
+	{
+		try {
+			$invoices = DB::table('invoice')->orderByDesc('id')->get();
+			return $invoices;
+		} catch (\Exception $e) {
+			return $e->getMessage();
+		}
 	}
 }

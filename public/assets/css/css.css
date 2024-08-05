@@ -107,8 +107,8 @@
 }
 
 .select2-container--default .select2-dropdown {
-	border: 1px solid #ccc;    /* Border for the dropdown */
-	border-radius: 10px;        /* Rounded corners for the dropdown */
+	border: 1px solid #ccc;
+	border-radius: 10px;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
@@ -120,4 +120,51 @@
 .btn-outline-primary:focus, .btn-outline-primary:hover {
 	background: rgb(141, 206, 213);
 	border: solid #00b3af 1px;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+	text-align: center;
+	margin-top: 1rem;
+}
+
+.dataTables_wrapper .dataTables_paginate ul {
+	display: inline-flex;
+	padding-left: 0;
+}
+
+#invoices_filter {
+	margin-bottom: 1rem;
+}
+
+#invoices_filter label {
+	width: 100%;
+	text-align: center;
+	font-size: 14px;
+}
+
+.dataTable thead th {
+	font-size: 14px;
+	color: #494949;
+}
+
+.active > .page-link,
+.page-link.active {
+    background-color: #00b3af ; /* Background color for active links */
+    color: #fff;               /* Text color for active links */
+    border-color: #00b3af ;     /* Border color for active links */
+}
+
+.badge-success {
+	background: #ecfdf3;
+	color: #027a48;
+}
+
+.badge-draft {
+	background: #f2f5ff;
+	color: #2c55e7;
+}
+
+.badge-progress {
+	background: #fff6f7;
+	color: #c51025;
 }

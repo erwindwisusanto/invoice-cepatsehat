@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\InvoiceService;
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 
 class InvoiceController extends Controller
 {
@@ -55,5 +56,11 @@ class InvoiceController extends Controller
 			'status' => 'success',
 			'message' => $result['message'],
     ]);
+	}
+
+	public function invoices(Request $request)
+	{
+		$invoices = $this->invoiceService->GetInvoices();
+		return DataTables::of($invoices)->make(true);
 	}
 }
