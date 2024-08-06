@@ -352,13 +352,15 @@
     $('.items-diagnosis').empty();
 
     data?.cptData?.forEach((cpt, cptIndex) => {
-			let infusionName = cpt?.cpt_infusion || '';
+			let infusionName = cpt?.cpt_infusion ? `- ${cpt?.cpt_infusion}` : '';
+			let additionalReceipt = cpt?.cpt_additional ? `- ${cpt?.cpt_additional}` : '';
 			let cptHtml = `
 				<span class="fs-12">${cpt.cpt_code}</span>
 				<div class="d-flex align-items-center justify-content-between mb-2">
 						<div class="detail">
 							<h5>${cpt.cpt_desc}</h5>
 							<span>${infusionName}</span>
+							<span>${additionalReceipt}</span>
 						</div>
 						<div class="status">
 							<span class="fs-14">${cpt.cpt_pax}pax</span>

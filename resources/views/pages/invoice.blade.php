@@ -235,14 +235,16 @@
 			try {
 				if (Array.isArray(decodedJsonData)) {
 					decodedJsonData.map(function(item) {
-						let infusionName = `- ${item.cpt_infusion}` || '';
+						let infusionName = item.cpt_infusion ?  `<b>- ${item.cpt_infusion}</b>` : '';
+						let additionalReceipt = item?.cpt_additional ? `- ${item.cpt_additional}` : '';
 						let html = `<div class="row">
                 <div class="col-6">
                     ${item.cpt_code} <span class="font-weight-bold">${item.cpt_desc}</span> <br>
                     <span class="font-weight-bold">${infusionName}</span>
+										<span>${additionalReceipt}</span>
                 </div>
 								<div class="col-2 text-right">
-                  ${item.cpt_pax}Pax
+                  ${item.cpt_pax} Pax
                 </div>
                 <div class="col-3 text-right">
                   ${formatter.format(item.cpt_price)}<br>
@@ -265,7 +267,7 @@
 			}
 
 			const totalPrice = decodedJsonData
-				.map(item => parseInt(item.cpt_price))
+				.map(item => parseInt(item.cpt_price) * parseInt(item.cpt_pax))
 				.reduce((acc, price) => acc + price, 0);
 
 			const totalPax = decodedJsonData
