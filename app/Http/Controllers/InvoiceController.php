@@ -87,10 +87,11 @@ class InvoiceController extends Controller
 		$complimentaryDiscount = $invoice->complimentary_discount;
 		$medicalTeamTransportCost = $invoice->medical_team_transport_cost;
 		$paymentMethodSelected = $invoice->payment_method;
-		$diadnosis = $invoice->diagnosis;
+		$diagnosis = json_decode($invoice->diagnosis) ?? [];
 		$username = $invoice->username;
 
 		$paymentMethods = $this->invoiceService->ListPaymentMethod();
+		$infusions = $this->invoiceService->getInfusions();
 		$icdxs = $this->invoiceService->ListIcdxs();
 		$cpts = $this->invoiceService->ListCpts();
 
@@ -103,11 +104,12 @@ class InvoiceController extends Controller
 				'medicalTeamTransportCost',
 				'paymentMethods',
 				'paymentMethodSelected',
-				'diadnosis',
+				'diagnosis',
 				'formattedDate',
 				'icdxs',
 				'cpts',
-				'username'
+				'username',
+				'infusions'
 				)
 		);
 	}

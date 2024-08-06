@@ -1,17 +1,17 @@
 <x-master-layout>
-	<x-breadcrumbs route="{{ route('view_invoice') }}" title="Edit Invoice" />
+	<x-breadcrumbs route="{{ route('view_invoice') }}" title="New Invoice" />
 	<div class="content-body pb-5">
 		<div class="container">
 			<div class="mb-2">
 				<p class="fs-14 fw-semibold mb-0">
 					No.
-					<span class="text-muted fw-normal">{{ $invoiceNumber ?? '-' }}</span>
+					<span class="text-muted fw-normal">{{ $invoiceNumber }}</span>
 				</p>
 			</div>
 			<div class="mb-3">
 				<p class="fs-14 fw-semibold">
 					Date:
-					<span class="text-muted fw-normal">{{ $date ?? '-' }}</span>
+					<span class="text-muted fw-normal">{{ $formattedDate }}</span>
 				</p>
 			</div>
 			<form class="mt-2" id="form-new-invoice" novalidate>
@@ -37,7 +37,7 @@
 						class="form-control bg-white"
 						rows="3"
 						placeholder="Address ..."
-						id="address">{{ $address ?? '-' }}</textarea>
+						id="address">{{ $address ?? '' }}</textarea>
 				</div>
 				<div class="mb-4">
 					<label for="" class="form-label">Phone*</label>
@@ -78,7 +78,7 @@
 						name="complimentary_discount"
 						aria-describedby=""
 						placeholder="eg. 500.000"
-						value="{{ $complimentaryDiscount ?? '-' }}"
+						value="{{ $complimentaryDiscount ?? 0 }}"
 						/>
 				</div>
 				<div class="mb-4">
@@ -92,7 +92,7 @@
 						name="medical_team_transport_cost"
 						aria-describedby=""
 						placeholder="eg. 500.000"
-						value="{{ $medicalTeamTransportCost ?? '-' }}"
+						value="{{ $medicalTeamTransportCost ?? 0 }}"
 						/>
 				</div>
 				<div class="mb-4">
@@ -134,7 +134,7 @@
 				data-bs-dismiss="offcanvas"
 				aria-label="Close"></button>
 		</div>
-		<div class="offcanvas-body pb-3">
+		<div class="offcanvas-body pb-3" style="overflow-y: auto;">
 			<form id="formpopup">
 				<div class="mb-4">
 					<label for="cpt" class="form-label">CPT Code*</label>
@@ -148,8 +148,20 @@
 						</div>
 					</div>
 				</div>
+				<div class="mb-4 d-none" id="cube_infusion">
+					<label for="infusion" class="form-label">Infusions*</label>
+					<div id="infusion_cube">
+						<div class="d-flex align-items-center" style="margin-bottom: 10px;">
+							<select class="form-select bg-white selecttwo" aria-label="Default select example" id="infusion" name="infusion">
+								@foreach ($infusions as $infusion)
+									<option value="{{ $infusion->price }}" data-desc="{{ $infusion->infusion }}">{{ $infusion->infusion }}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+				</div>
 				<div class="mb-4 mt-3">
-					<label for="" class="form-label">Pax*</label>
+					<label for="pax" class="form-label">Pax*</label>
 					<input
 						type="number"
 						class="form-control bg-white"
@@ -158,7 +170,26 @@
 						aria-describedby=""
 						placeholder="eg. 1" required/>
 				</div>
-				<div class="mb-4">
+				<div class="mb-4 mt-3 d-none custom_additional_cube">
+					<label for="custom_price" class="form-label">Price*</label>
+					<input
+						type="number"
+						class="form-control bg-white"
+						id="custom_price"
+						name="custom_price"
+						aria-describedby=""
+						placeholder="eg. 10.000"/>
+				</div>
+				<div class="mb-4 mt-3 d-none custom_additional_cube">
+					<label for="custom_additional" class="form-label">Additional*</label>
+					<textarea
+						name="custom_additional"
+						class="form-control bg-white"
+						rows="3"
+						placeholder="Paracetamol etc..."
+						id="custom_additional"></textarea>
+				</div>
+				<div class="mb-4 d-none icdx_code">
 					<label for="icdx" class="form-label">ICD10 Code*</label>
 					<div id="icdx_cube">
 						<div class="icdx-row d-flex align-items-center" style="margin-bottom: 10px;">
@@ -174,7 +205,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="mb-4">
+				<div class="mb-4 d-none icdx_code">
 					<span>
 						<button class="btn btn-outline-primary btn-small" type="button" id="add-new-icdx">
 							<i class="mdi mdi-plus-circle me-2"></i>
@@ -195,7 +226,7 @@
 
 	let cptCounter = 1;
 	let icdxCounter = 1;
-	let cptDatax = [];
+	let cptDatax = @json($diagnosis);
 
 	const Toast = Swal.mixin({
 		toast: true,
@@ -264,7 +295,22 @@
 	}
 
 	const saveFormData = () => {
+    let cpt = parseInt($('#cpt').val());
     let pax = $('#pax').val();
+
+		let customAdditional;
+		let infusionValue;
+		let infusionName;
+
+		if (cpt === 3 || cpt === 4 || cpt === 5) {
+			infusionValue = $('#custom_price').val();
+			customAdditional = $('#custom_additional').val() || '';
+		} else if (cpt === 2) {
+			let infusionElement = $('#infusion');
+			let selectedOptionInf = infusionElement.find('option:selected');
+			infusionValue = infusionElement.val() || 0;
+			infusionName = selectedOptionInf.data('desc');
+		}
 
     let selectElement = $('#cpt_cube .cpt-row').find('select');
     let cptId = selectElement.val();
@@ -295,6 +341,9 @@
 				cpt_code: diagnosisCode,
 				cpt_pax: pax,
 				cpt_desc: nameDiagnosis || '',
+				cpt_price: infusionValue,
+				cpt_infusion: infusionName,
+				cpt_additional: customAdditional,
 				cpt_icd: icdxData
 			});
     }
@@ -306,15 +355,20 @@
     return JSON.stringify(formData);
 	};
 
+
 	const listItemsSelected = (data) => {
     $('.items-diagnosis').empty();
 
     data?.cptData?.forEach((cpt, cptIndex) => {
+			let infusionName = cpt?.cpt_infusion ? `- ${cpt?.cpt_infusion}` : '';
+			let additionalReceipt = cpt?.cpt_additional ? `- ${cpt?.cpt_additional}` : '';
 			let cptHtml = `
 				<span class="fs-12">${cpt.cpt_code}</span>
 				<div class="d-flex align-items-center justify-content-between mb-2">
 						<div class="detail">
 							<h5>${cpt.cpt_desc}</h5>
+							<span>${infusionName}</span>
+							<span>${additionalReceipt}</span>
 						</div>
 						<div class="status">
 							<span class="fs-14">${cpt.cpt_pax}pax</span>
@@ -409,15 +463,18 @@
 		"cpt_code": 99451,
 		"cpt_pax": "1",
 		"cpt_desc": "Konsultasi telehealth, evaluasi dan manajemen data medis jarak jauh. (konsultasi dokter)",
+		"cpt_price": "500000",
+		"cpt_infusion": "",
+		"cpt_additional": "",
 		"cpt_icd": []
 	};
 
 	$(document).ready(function () {
-		cptDatax.push(defaultData);
 		listItemsSelected({ cptData: cptDatax });
 
 		$('.selecttwo').select2({
-			dropdownParent: $("#offcanvasDiagnosis")
+			dropdownParent: $("#offcanvasDiagnosis"),
+			width: '100%'
 		});
 
 		$('#form-new-invoice').validate({
@@ -453,10 +510,49 @@
 			submitHandler: submitNewInvoice
 		});
 
+		$('#cpt').on('change', function() {
+			const defaultOption = 1;
+			const infusion = 2;
+			const additional1 = 3;
+			const additional2 = 4;
+			const additional3 = 5;
+			let selectedValue = $(this).val();
+			if (parseInt(selectedValue) === infusion) {
+				$('#cube_infusion').removeClass('d-none');
+				$('.icdx_code').removeClass('d-none');
+				$('.custom_additional_cube').addClass('d-none');
+			} else if (parseInt(selectedValue) === defaultOption) {
+				$('.icdx_code').addClass('d-none');
+				$('#cube_infusion').addClass('d-none');
+				$('.custom_additional_cube').addClass('d-none');
+			} else if (parseInt(selectedValue) === additional1 || parseInt(selectedValue) === additional2 || parseInt(selectedValue) === additional3) {
+				$('.custom_additional_cube').removeClass('d-none');
+				$('#cube_infusion').addClass('d-none');
+				$('.icdx_code').removeClass('d-none');
+			} else {
+				$('#cube_infusion').addClass('d-none');
+				$('.icdx_code').removeClass('d-none');
+				$('.custom_additional_cube').addClass('d-none');
+			}
+    });
+
 		$('#payment_method').select2( {
 			width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
 			placeholder: $( this ).data( 'placeholder' ),
 			closeOnSelect: true,
 		});
+
+		var selectedMethods = {{ $paymentMethodSelected ?? [] }};
+		$('#payment_method').val(selectedMethods).trigger('change');
 	});
+
+	const defaultCpt = () => {
+		$.ajax({
+			type: 'GET',
+			url: '{{ route("get_default_cpt") }}',
+			success: function(response){
+				console.log(response);
+			},
+		});
+	}
 </script>
