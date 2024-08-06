@@ -46,6 +46,9 @@ class InvoiceService
 					'cpt_code' => $item['cpt_code'],
 					'cpt_pax' => $item['cpt_pax'],
 					'cpt_desc' => $item['cpt_desc'],
+					'cpt_price' => $item['cpt_price'],
+					'cpt_infusion' => $item['cpt_infusion'] ?? '',
+					'cpt_additional' => $item['cpt_additional'] ?? '',
 					'cpt_icd' => $item['cpt_icd']
 				];
 			}
@@ -64,7 +67,7 @@ class InvoiceService
 				'username' => $username,
 				'address' => $address,
 				'phone' => $phoneNumber,
-				'invoice_numner' => $invoiceNumber,
+				'invoice_number' => $invoiceNumber,
 				'complimentary_discount' => $complimentaryDiscount,
 				'medical_team_transport_cost' => $medicalTeamTransportCost,
 				'payment_method' => $payment_methods_json,
@@ -118,7 +121,40 @@ class InvoiceService
 	{
 		try {
 			$invoices = DB::table('invoice')->orderByDesc('id')->get();
+			foreach ($invoices as $invoice) {
+				$invoice->id = encryptData($invoice->id);
+			}
 			return $invoices;
+		} catch (\Exception $e) {
+			return $e->getMessage();
+		}
+	}
+
+	public function getInvoice($invoiceId)
+	{
+		try {
+			$invoices = DB::table('invoice')->where('id', $invoiceId)->first();
+			return $invoices;
+		} catch (\Exception $e) {
+			return $e->getMessage();
+		}
+	}
+
+	public function getInfusions()
+	{
+		try {
+			$infusion = DB::table('infusion')->get();
+			return $infusion;
+		} catch (\Exception $e) {
+			return $e->getMessage();
+		}
+	}
+
+	public function DefaultCpt()
+	{
+		try {
+			$cpt = DB::table('cpt')->where('id', 2)->first();
+			return $cpt;
 		} catch (\Exception $e) {
 			return $e->getMessage();
 		}

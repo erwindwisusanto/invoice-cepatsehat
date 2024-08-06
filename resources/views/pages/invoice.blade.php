@@ -85,14 +85,16 @@
           </div>
         </div>
         <hr />
-        <div class="d-flex justify-content-between mb-3">
+        <div class="d-flex justify-content-between mb-3 total-pax">
           <span class="fs-12 fw-semibold text-muted">Pax</span>
-          <p class="fs-14 mb-0">1x</p>
+          <p class="fs-14 mb-0"></p>
         </div>
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-between total-price">
           <span class="fs-12 fw-semibold text-muted">Total</span>
-          <p class="fs-16 mb-0 fw-semibold">Rp200.000</p>
+          <p class="fs-16 mb-0 fw-semibold"></p>
         </div>
+				<div id="is_draft">
+				</div>
       </div>
 		</div>
 	</div>
@@ -132,6 +134,18 @@
 		}
 		return `<span class="${classNamebadge} fs-14" style="font-weight: normal;">${name}</span>`;
 	}
+
+	const directToNewInvoice = (invoiceId) => {
+		const newUrl = `/draft-invoice/${encodeURIComponent(invoiceId)}`;
+		window.location.href = newUrl;
+	}
+
+	const formatter = new Intl.NumberFormat('id-ID', {
+		style: 'currency',
+		currency: 'IDR',
+		minimumFractionDigits: 0,
+  	maximumFractionDigits: 0
+	});
 
 	$(document).ready(function () {
 		const invoiceTable = $('#invoices').DataTable({
@@ -196,14 +210,16 @@
 			let rowData = invoiceTable.row($(this).closest('tr')).data();
 			let offcanvasElement = document.getElementById('offcanvasDetail');
 			let offcanvas = new bootstrap.Offcanvas(offcanvasElement);
-			console.log(rowData);
 
-			let invoiceNumber = rowData?.invoice_numner;
+			let invoiceNumber = rowData?.invoice_number;
 			let date = rowData?.created_at;
 			let name = rowData?.username;
 			let address = rowData?.address;
 			let phone = rowData?.phone;
 			let status = rowData?.status;
+			let invoiceId = rowData?.id;
+
+			var fixJson = rowData?.diagnosis.replace(/&quot;/g, '"');
 
 			$('#offcanvasDetailLabel').html(`
 				No Invoice: ${invoiceNumber} ${statusInvoice(parseInt(status))}
@@ -213,6 +229,63 @@
 			$('#offcanvasDetail .list-data-invoice .items-data:nth-child(1) p').text(name);
 			$('#offcanvasDetail .list-data-invoice .items-data:nth-child(2) p').text(address);
 			$('#offcanvasDetail .list-data-invoice .items-data:nth-child(3) p').text(phone);
+
+			$('#offcanvasDetail .list-data-invoice .items-data:nth-child(4) ul').html('');
+			var decodedJsonData = JSON.parse(fixJson);
+			try {
+				if (Array.isArray(decodedJsonData)) {
+					decodedJsonData.map(function(item) {
+						let infusionName = `- ${item.cpt_infusion}` || '';
+						let html = `<div class="row">
+                <div class="col-6">
+                    ${item.cpt_code} <span class="font-weight-bold">${item.cpt_desc}</span> <br>
+                    <span class="font-weight-bold">${infusionName}</span>
+                </div>
+								<div class="col-2 text-right">
+                  ${item.cpt_pax}Pax
+                </div>
+                <div class="col-3 text-right">
+                  ${formatter.format(item.cpt_price)}<br>
+                </div>
+            </div>`;
+            var newItem = $('<li></li>').html(html);
+            $('#offcanvasDetail .list-data-invoice .items-data:nth-child(4) ul').append(newItem);
+            if (item.cpt_icd && item.cpt_icd.length > 0) {
+							item.cpt_icd.map(function(icd) {
+								var icdItem = $('<li></li>').html(`${icd.icdx_code}, ${icd.icdx_desc}`).css("margin-left", "20px");
+								$('#offcanvasDetail .list-data-invoice .items-data:nth-child(4) ul').append(icdItem);
+							});
+            }
+        });
+				} else {
+					console.error("Parsed JSON data is not an array:", decodedJsonData);
+				}
+			} catch (error) {
+				console.error("Error parsing JSON:", error);
+			}
+
+			const totalPrice = decodedJsonData
+				.map(item => parseInt(item.cpt_price))
+				.reduce((acc, price) => acc + price, 0);
+
+			const totalPax = decodedJsonData
+				.map(item => parseInt(item.cpt_pax))
+				.reduce((acc, pax) => acc + pax, 0);
+
+			$('#offcanvasDetail .total-pax p').text(`${totalPax}x`);
+			$('#offcanvasDetail .total-price p').text(formatter.format(totalPrice));
+
+			if (status === 1) {
+				$('#is_draft').html(`
+					<div class="col-12 mt-3">
+						<a onclick='directToNewInvoice("${invoiceId}")' type="submit" class="btn btn-primary w-100">
+							Edit
+						</a>
+					</div>
+				`);
+			} else {
+				$('#is_draft').empty();
+			}
 
 			offcanvas.show();
 		});

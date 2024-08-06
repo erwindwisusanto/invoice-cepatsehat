@@ -71,14 +71,8 @@
 				url: '{{ route("post_signin") }}',
 				data: $(form).serialize(),
 				success: function(response) {
-					Swal.fire({
-						icon: 'success',
-						text: 'Signup successful!',
-						timer: 1000,
-    				showConfirmButton: false
-					}).then(() => {
-						window.location.href = '/';
-					});
+					window.location.href = "/";
+					history.replaceState(null, null, "/");
 				},
 				error: function(xhr, status, error) {
 					Swal.fire({
