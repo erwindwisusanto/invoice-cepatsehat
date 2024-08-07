@@ -77,7 +77,7 @@ class InvoiceController extends Controller
 
 	public function draftInvoice(Request $request, $invoiceId)
 	{
-		$invoice = $this->invoiceService->getInvoice(decryptData($invoiceId));
+		$invoice = $this->invoiceService->getInvoice(decryptId($invoiceId));
 
 		$invoiceNumber = $invoice->invoice_number;
 		$date = Carbon::createFromFormat('Y-m-d H:i:s', $invoice->created_at);

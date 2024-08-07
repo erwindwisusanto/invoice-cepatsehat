@@ -122,7 +122,7 @@ class InvoiceService
 		try {
 			$invoices = DB::table('invoice')->orderByDesc('id')->get();
 			foreach ($invoices as $invoice) {
-				$invoice->id = encryptData($invoice->id);
+				$invoice->id = encryptId($invoice->id);
 			}
 			return $invoices;
 		} catch (\Exception $e) {

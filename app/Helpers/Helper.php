@@ -1,22 +1,38 @@
 <?php
 
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Contracts\Encryption\DecryptException;
-
-if (!function_exists('encryptData')) {
-	function encryptData($data)
+if (!function_exists('encryptID')) {
+	function encryptID($string)
 	{
-		return Crypt::encryptString($data);
+		$output = false;
+
+		$security = parse_ini_file("security.ini");
+		$secret_key = $security["encryption_key"];
+		$secret_iv = $security["iv"];
+		$encrypt_method = $security["encryption_mechanism"];
+
+		$key = hash("sha256", $secret_key);
+		$iv = substr(hash("sha256", $secret_iv), 0, 16);
+
+		$result = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
+		$output = base64_encode($result);
+		return $output;
 	}
 }
 
-if (!function_exists('decryptData')) {
-	function decryptData($encryptedData)
+if (!function_exists('decryptID')) {
+	function decryptID($string)
 	{
-		try {
-			return Crypt::decryptString($encryptedData);
-		} catch (DecryptException $e) {
-			return 'Decryption failed';
-		}
+		$output = false;
+
+		$security = parse_ini_file("security.ini");
+		$secret_key = $security["encryption_key"];
+		$secret_iv = $security["iv"];
+		$encrypt_method = $security["encryption_mechanism"];
+
+		$key = hash("sha256", $secret_key);
+		$iv = substr(hash("sha256", $secret_iv), 0, 16);
+
+		$output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+		return $output;
 	}
 }
