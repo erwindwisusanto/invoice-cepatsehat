@@ -116,6 +116,7 @@ class InvoiceController extends Controller
 
 	public function viewInvoiceGuest($invoiceId)
 	{
-		$invoice = $this->invoiceService->getInvoice(decryptData($invoiceId));
+		// $invoice = $this->invoiceService->getInvoice(decryptData($invoiceId));
+		return view('pages.preview-invoice');
 	}
 }
