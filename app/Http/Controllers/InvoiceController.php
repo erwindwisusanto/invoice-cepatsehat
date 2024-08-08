@@ -116,7 +116,27 @@ class InvoiceController extends Controller
 
 	public function viewInvoiceGuest($invoiceId)
 	{
-		// $invoice = $this->invoiceService->getInvoice(decryptData($invoiceId));
-		return view('pages.preview-invoice');
+		// 23 -> QVhRQnVZdG5XRGdPQis0WmFzallsZz09
+		$invoiceId = 'QVhRQnVZdG5XRGdPQis0WmFzallsZz09';
+		$invoice = $this->invoiceService->getInvoice(decryptID($invoiceId));
+
+		$invoiceNumber = $invoice->invoice_number;
+		$date = Carbon::parse($invoice->created_at)->format('F, j Y');
+		$username = $invoice->username;
+		$address = $invoice->address;
+		$diagnosis = json_decode($invoice->diagnosis) ?? [];
+		$complimentaryDiscount = $invoice->complimentary_discount;
+		$medicalTeamTransportCost = $invoice->medical_team_transport_cost;
+
+		return view('pages.preview-invoice',
+			compact(
+				'invoiceNumber',
+				'date',
+				'username',
+				'address',
+				'diagnosis',
+				'complimentaryDiscount',
+				'medicalTeamTransportCost'
+			));
 	}
 }
