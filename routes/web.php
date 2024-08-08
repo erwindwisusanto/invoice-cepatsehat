@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
+
 Route::middleware('guest:web')->group(function () {
 	Route::view('/signin', 'pages.signin')->name('signin');
 	Route::view('/signup', 'pages.signup')->name('signup');
