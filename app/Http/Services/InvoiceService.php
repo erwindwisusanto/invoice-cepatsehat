@@ -24,7 +24,7 @@ class InvoiceService
 		return $cpt;
 	}
 
-	public function saveNewInvoice($form, $form2)
+	public function saveNewInvoice($form, $form2, $buttonType)
 	{
 		$username = $form['username'] ?? null;
     $address 	= $form['address'] ?? null;
@@ -32,6 +32,10 @@ class InvoiceService
     $complimentaryDiscount = !empty($form['complimentary_discount']) ? $form['complimentary_discount'] : 0;
     $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? $form['medical_team_transport_cost'] : 0;
     $invoiceNumber = $form['invoice_number'] ?? null;
+
+		$statusDraft = 1;
+		$statusOnProccess = 2;
+		$status = $buttonType === "NEW" ? $statusOnProccess : $statusDraft;
 
 		$payment_methods = [];
     if (isset($form['payment_method']) && is_array($form['payment_method'])) {
@@ -73,6 +77,7 @@ class InvoiceService
 				'payment_method' => $payment_methods_json,
 				'diagnosis' => $cpt_data_json,
 				'unique_invoice_number' => $uniqueNumbers,
+				'status' => $status,
 				'created_at' => Carbon::now(),
 				'updated_at' => Carbon::now(),
 			]);
@@ -82,6 +87,82 @@ class InvoiceService
 			return [
 				'success' => true,
 				'message' => 'success create new invoice',
+				'isDraft' => $status,
+			];
+		} catch (\Exception $e) {
+			DB::rollBack();
+			return [
+				'success' => false,
+				'message' => $e->getMessage(),
+			];
+		}
+	}
+
+	public function updateInvoice($form, $form2, $buttonType)
+	{
+		$username = $form['username'] ?? null;
+    $address 	= $form['address'] ?? null;
+    $phoneNumber = $form['phone_number'] ?? null;
+    $complimentaryDiscount = !empty($form['complimentary_discount']) ? $form['complimentary_discount'] : 0;
+    $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? $form['medical_team_transport_cost'] : 0;
+    $invoiceNumber = $form['invoice_number'] ?? null;
+		$invoiceId = decryptID($form['invoice_id']) ?? null;
+
+		$statusDraft = 1;
+		$statusOnProccess = 2;
+		$status = $buttonType === "NEW" ? $statusOnProccess : $statusDraft;
+
+		$payment_methods = [];
+    if (isset($form['payment_method']) && is_array($form['payment_method'])) {
+      $payment_methods = array_map('intval', $form['payment_method']);
+    }
+
+		$cpt_data = [];
+    if (is_array($form2)) {
+			foreach ($form2 as $item) {
+				$cpt_data[] = [
+					'cpt_id' => $item['cpt_id'],
+					'cpt_code' => $item['cpt_code'],
+					'cpt_pax' => $item['cpt_pax'],
+					'cpt_desc' => $item['cpt_desc'],
+					'cpt_price' => $item['cpt_price'],
+					'cpt_infusion' => $item['cpt_infusion'] ?? '',
+					'cpt_additional' => $item['cpt_additional'] ?? '',
+					'cpt_icd' => $item['cpt_icd']
+				];
+			}
+    }
+
+		$uniqueNumbers = $this->getLatestUniqueNumber();
+
+		$payment_methods_json = json_encode($payment_methods);
+    $cpt_data_json = json_encode($cpt_data);
+
+		DB::beginTransaction();
+
+		try {
+			sleep(1);
+			DB::table('invoice')->where('id', $invoiceId)->update([
+				'username' => $username,
+				'address' => $address,
+				'phone' => $phoneNumber,
+				'invoice_number' => $invoiceNumber,
+				'complimentary_discount' => $complimentaryDiscount,
+				'medical_team_transport_cost' => $medicalTeamTransportCost,
+				'payment_method' => $payment_methods_json,
+				'diagnosis' => $cpt_data_json,
+				'unique_invoice_number' => $uniqueNumbers,
+				'status' => $status,
+				'created_at' => Carbon::now(),
+				'updated_at' => Carbon::now(),
+			]);
+
+			DB::commit();
+
+			return [
+				'success' => true,
+				'message' => 'success create new invoice',
+				'isDraft' => $status,
 			];
 		} catch (\Exception $e) {
 			DB::rollBack();

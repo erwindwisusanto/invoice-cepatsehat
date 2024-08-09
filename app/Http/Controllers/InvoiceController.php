@@ -21,6 +21,11 @@ class InvoiceController extends Controller
 		return view('pages.invoice');
 	}
 
+	public function success()
+	{
+		return view('pages.success');
+	}
+
 	public function newInvoice()
 	{
 		$year 					= date('Y');
@@ -44,8 +49,16 @@ class InvoiceController extends Controller
 		$form = [];
     parse_str($request->input('form'), $form);
 		$form2 = json_decode($request->input('form2'), true);
+		$formType = (string) $request->input('formType');
+		$buttonType = (string) $request->input('buttonType');
 
-		$result = $this->invoiceService->saveNewInvoice($form, $form2);
+		if ($formType === "NEW INVOICE") {
+			$result = $this->invoiceService->saveNewInvoice($form, $form2, $buttonType);
+		}
+
+		if ($formType === "DRAFT INVOICE") {
+			$result = $this->invoiceService->updateInvoice($form, $form2, $buttonType);
+		}
 
 		if (!$result['success']) {
 			return response()->json([
@@ -57,6 +70,7 @@ class InvoiceController extends Controller
 		return response()->json([
 			'status' => 'success',
 			'message' => $result['message'],
+			'isDraft' => $result['isDraft'],
     ]);
 	}
 
@@ -89,6 +103,7 @@ class InvoiceController extends Controller
 		$paymentMethodSelected = $invoice->payment_method;
 		$diagnosis = json_decode($invoice->diagnosis) ?? [];
 		$username = $invoice->username;
+		$invoiceId = encryptID($invoice->id);
 
 		$paymentMethods = $this->invoiceService->ListPaymentMethod();
 		$infusions = $this->invoiceService->getInfusions();
@@ -109,15 +124,14 @@ class InvoiceController extends Controller
 				'icdxs',
 				'cpts',
 				'username',
-				'infusions'
+				'infusions',
+				'invoiceId'
 				)
 		);
 	}
 
 	public function viewInvoiceGuest($invoiceId)
 	{
-		// 23 -> QVhRQnVZdG5XRGdPQis0WmFzallsZz09
-		$invoiceId = 'QVhRQnVZdG5XRGdPQis0WmFzallsZz09';
 		$invoice = $this->invoiceService->getInvoice(decryptID($invoiceId));
 
 		$invoiceNumber = $invoice->invoice_number;

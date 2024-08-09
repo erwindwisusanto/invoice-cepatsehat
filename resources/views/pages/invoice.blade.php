@@ -89,6 +89,14 @@
           <span class="fs-12 fw-semibold text-muted">Pax</span>
           <p class="fs-14 mb-0"></p>
         </div>
+				<div class="d-flex justify-content-between mb-3 compdisc">
+          <span class="fs-12 fw-semibold text-muted">Complimentary Discount</span>
+          <p class="fs-14 mb-0"></p>
+        </div>
+				<div class="d-flex justify-content-between mb-3 cost">
+          <span class="fs-12 fw-semibold text-muted">Medical Team Transport Cost</span>
+          <p class="fs-14 mb-0"></p>
+        </div>
         <div class="d-flex justify-content-between total-price">
           <span class="fs-12 fw-semibold text-muted">Total</span>
           <p class="fs-16 mb-0 fw-semibold"></p>
@@ -218,11 +226,13 @@
 			let phone = rowData?.phone;
 			let status = rowData?.status;
 			let invoiceId = rowData?.id;
+			let complimentaryDiscount = rowData?.complimentary_discount;
+			let medicalTeamTransportCost = rowData?.medical_team_transport_cost;
 
 			var fixJson = rowData?.diagnosis.replace(/&quot;/g, '"');
 
 			$('#offcanvasDetailLabel').html(`
-				No Invoice: ${invoiceNumber} ${statusInvoice(parseInt(status))}
+				No Invoice: <a href="/invoice/${invoiceId}" target="_blank">${invoiceNumber}</a> ${statusInvoice(parseInt(status))}
 				<p class="fs-12 text-muted mb-0">${formatingDate(date)}</p>
 			`);
 
@@ -274,8 +284,13 @@
 				.map(item => parseInt(item.cpt_pax))
 				.reduce((acc, pax) => acc + pax, 0);
 
+
+			let finalPrice = (totalPrice - complimentaryDiscount) + medicalTeamTransportCost;
+
 			$('#offcanvasDetail .total-pax p').text(`${totalPax}x`);
-			$('#offcanvasDetail .total-price p').text(formatter.format(totalPrice));
+			$('#offcanvasDetail .compdisc p').text(formatter.format(complimentaryDiscount));
+			$('#offcanvasDetail .cost p').text(formatter.format(medicalTeamTransportCost));
+			$('#offcanvasDetail .total-price p').text(formatter.format(finalPrice));
 
 			if (status === 1) {
 				$('#is_draft').html(`

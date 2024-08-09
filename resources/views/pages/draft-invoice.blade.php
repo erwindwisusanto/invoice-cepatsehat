@@ -1,5 +1,5 @@
 <x-master-layout>
-	<x-breadcrumbs route="{{ route('view_invoice') }}" title="New Invoice" />
+	<x-breadcrumbs route="{{ route('view_invoice') }}" title="Edit Invoice" />
 	<div class="content-body pb-5">
 		<div class="container">
 			<div class="mb-2">
@@ -18,6 +18,7 @@
 				@method('POST')
 				@csrf
 				<input type="hidden" name="invoice_number" id="invoice_number" value="{{ $invoiceNumber }}">
+				<input type="hidden" name="invoice_id" id="invoice_id" value="{{ $invoiceId }}">
 				<div class="mb-4">
 					<label for="" class="form-label">Username*</label>
 					<input
@@ -105,12 +106,13 @@
 				</div>
 				<div class="row gx-2">
 					<div class="col-6">
-						<a href="#" class="btn btn-outline-primary w-100">
-							Save as Draft
-						</a>
+						<button type="submit" class="btn btn-outline-primary w-100" id="submit-draft-invoice" data-is-draft="true">
+							Save as Draft &nbsp;
+							<span id="loading-spinner-invoice-draft" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+						</button>
 					</div>
 					<div class="col-6">
-						<button type="submit" class="btn btn-primary w-100" id="submit-new-invoice">
+						<button type="submit" class="btn btn-primary w-100" id="submit-new-invoice" data-is-draft="false">
 							Submit &nbsp;
 							<span id="loading-spinner-invoice" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
 						</button>
@@ -240,14 +242,35 @@
 		}
 	});
 
+	let isDraftButtonClicked;
+	$('#submit-new-invoice').on('click', function(event) {
+		isDraftButtonClicked = "NEW";
+	});
+
+	$('#submit-draft-invoice').on('click', function(event) {
+		isDraftButtonClicked = "DRAFT";
+	});
+
 	const submitNewInvoice = (form) => {
 		const submitButton = $('#submit-new-invoice');
+		const submitButtonDraft = $('#submit-draft-invoice');
+
     const loadingSpinner = $('#loading-spinner-invoice');
+    const loadingSpinnerDraft = $('#loading-spinner-invoice-draft');
+
 		const disabledClass = 'btn-disabled';
 
-		submitButton.prop('disabled', true);
-		submitButton.addClass(disabledClass);
-    loadingSpinner.removeClass('d-none');
+		if (isDraftButtonClicked === "DRAFT") {
+			submitButtonDraft.prop('disabled', true);
+			submitButton.prop('disabled', true);
+			submitButtonDraft.addClass(disabledClass);
+			loadingSpinnerDraft.removeClass('d-none');
+    } else {
+			submitButton.prop('disabled', true);
+			submitButtonDraft.prop('disabled', true);
+			submitButton.addClass(disabledClass);
+			loadingSpinner.removeClass('d-none');
+    }
 
 		setTimeout(() => {
 			$.ajax({
@@ -256,10 +279,16 @@
 				data: {
 					form: $(form).serialize(),
 					form2: JSON.stringify(cptDatax),
+					formType: "DRAFT INVOICE",
+					buttonType: isDraftButtonClicked,
 					_token: $('meta[name="csrf-token"]').attr('content')
 				},
 				success: function(response) {
-					if (response.status == 'success') {
+					if (response.status === 'success' && parseInt(response.isDraft) === 2) {
+       				window.location.href = "{{ route('success') }}";
+					}
+
+					if (response.status === 'success' && parseInt(response.isDraft) === 1) {
 						window.location.href = "/";
 						history.replaceState(null, null, "/");
 					}
@@ -271,9 +300,17 @@
 					});
 				},
 				complete: function() {
-					submitButton.prop('disabled', false);
-					submitButton.removeClass(disabledClass);
-					loadingSpinner.addClass('d-none');
+					if (isDraftButtonClicked) {
+						submitButtonDraft.prop('disabled', false);
+						submitButton.prop('disabled', false);
+						submitButtonDraft.removeClass(disabledClass);
+						loadingSpinnerDraft.addClass('d-none');
+					} else {
+						submitButton.prop('disabled', false);
+						submitButtonDraft.prop('disabled', false);
+						submitButton.removeClass(disabledClass);
+						loadingSpinner.addClass('d-none');
+					}
 				}
 			});
 		}, 1000);
