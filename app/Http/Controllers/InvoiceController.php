@@ -154,6 +154,7 @@ class InvoiceController extends Controller
 		$diagnosis = json_decode($invoice->diagnosis) ?? [];
 		$complimentaryDiscount = $invoice->complimentary_discount;
 		$medicalTeamTransportCost = $invoice->medical_team_transport_cost;
+		$invoiceId = encryptID($invoice->id);
 
 		return view('pages.preview-invoice',
 			compact(
@@ -163,7 +164,19 @@ class InvoiceController extends Controller
 				'address',
 				'diagnosis',
 				'complimentaryDiscount',
-				'medicalTeamTransportCost'
-			));
+				'medicalTeamTransportCost',
+				'invoiceId'
+			)
+		);
+	}
+
+	public function doctorAction(Request $request)
+	{
+		$status = $request->status;
+		$invoiceId = $request->invoice_id;
+
+		if ($status === "ACCEPT") {
+			$this->invoiceService->Accept($invoiceId);
+		}
 	}
 }

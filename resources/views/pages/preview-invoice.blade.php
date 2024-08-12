@@ -129,13 +129,13 @@
 				@if (request()->query('view') === "oYR7Y")
 					<div class="row gx-0 d-flex justify-content-center" style="margin-top: 5vh">
 						<div class="col-5">
-							<button type="submit" class="btn btn-primary w-100" id="">
+							<button onclick="submitHandler('ACCEPT', '{{ $invoiceId }}')" class="btn btn-primary w-100" id="">
 								Accept &nbsp;
 								<span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
 							</button>
 						</div>
 						<div class="col-5 offset-1">
-							<button type="submit" class="btn btn-primary w-100" id="">
+							<button onclick="submitHandler('REJECT', '{{ $invoiceId }}')" class="btn btn-primary w-100" id="">
 								Reject &nbsp;
 								<span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
 							</button>
@@ -146,3 +146,23 @@
 		</div>
 	</div>
 </x-master-layout>
+<script>
+	'use strict';
+
+	const submitHandler = async (status, invoiceId) => {
+		try {
+			const response = await $.ajax({
+				url: `{{ route('doctor-action') }}`,
+				type: 'POST',
+				data: {
+					status,
+					invoice_id: invoiceId
+				}
+			});
+		} catch (error) {
+
+		} finally {
+
+		}
+	}
+</script>

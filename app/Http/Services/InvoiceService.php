@@ -276,4 +276,17 @@ class InvoiceService
 			return $e->getMessage();
 		}
 	}
+
+	public function Accept($invoiceId)
+	{
+		$updateStatus = $this->updateStatusInvoiceToDone(decryptID($invoiceId));
+		if ($updateStatus) {
+
+		}
+	}
+
+	private function updateStatusInvoiceToDone($invoiceId)
+	{
+		return DB::table('invoice')->where('id', $invoiceId)->update(['status' => 3]);
+	}
 }

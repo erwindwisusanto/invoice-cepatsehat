@@ -27,7 +27,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/invoice/{id}', [InvoiceController::class, 'viewInvoiceGuest'])->name('view_invoice_guest');
-Route::post('testing-qontak', [InvoiceController::class, 'testingQontak'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('doctor-action', [InvoiceController::class, 'doctorAction'])->name('doctor-action')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
 
 
