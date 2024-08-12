@@ -73,13 +73,14 @@
 				<div class="mb-4">
 					<label for="" class="form-label">Complimentary Discount</label>
 					<input
-						type="number"
+						type="text"
 						class="form-control bg-white"
 						id="complimentary_discount"
 						name="complimentary_discount"
 						aria-describedby=""
 						placeholder="eg. 500.000"
-						value="{{ $complimentaryDiscount ?? 0 }}"
+						value="{{ formatCurrency($complimentaryDiscount) ?? 0 }}"
+						oninput="formatCurrency(this)"
 						/>
 				</div>
 				<div class="mb-4">
@@ -87,13 +88,14 @@
 						Medical team transport cost
 					</label>
 					<input
-						type="number"
+						type="text"
 						class="form-control bg-white"
 						id="medical_team_transport_cost"
 						name="medical_team_transport_cost"
 						aria-describedby=""
 						placeholder="eg. 500.000"
-						value="{{ $medicalTeamTransportCost ?? 0 }}"
+						value="{{ formatCurrency($medicalTeamTransportCost) ?? 0 }}"
+						oninput="formatCurrency(this)"
 						/>
 				</div>
 				<div class="mb-4">
@@ -183,12 +185,14 @@
 				<div class="mb-4 mt-3 d-none custom_additional_cube">
 					<label for="custom_price" class="form-label">Price*</label>
 					<input
-						type="number"
+						type="text"
 						class="form-control bg-white"
 						id="custom_price"
 						name="custom_price"
 						aria-describedby=""
-						placeholder="eg. 10.000"/>
+						placeholder="eg. 10.000"
+						oninput="formatCurrency(this)"
+						/>
 				</div>
 				<div class="mb-4 mt-3 d-none custom_additional_cube">
 					<label for="custom_additional" class="form-label">Additional*</label>
@@ -454,6 +458,12 @@
 			listItemsSelected({ cptData: cptDatax });
     });
 	};
+
+	function formatCurrency(input) {
+    let value = input.value.replace(/[^0-9]/g, '');
+    value = new Intl.NumberFormat('id-ID').format(value);
+    input.value = value;
+	}
 
 	$('#formpopup').on('submit', function(e) {
 		e.preventDefault();

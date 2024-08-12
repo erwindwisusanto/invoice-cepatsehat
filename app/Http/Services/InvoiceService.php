@@ -42,8 +42,8 @@ class InvoiceService
 		$username = $form['username'] ?? null;
     $address 	= $form['address'] ?? null;
     $phoneNumber = $form['phone_number'] ?? null;
-    $complimentaryDiscount = !empty($form['complimentary_discount']) ? $form['complimentary_discount'] : 0;
-    $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? $form['medical_team_transport_cost'] : 0;
+    $complimentaryDiscount = !empty($form['complimentary_discount']) ? str_replace('.','', $form['complimentary_discount']) : 0;
+    $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? str_replace('.','', $form['medical_team_transport_cost']) : 0;
     $invoiceNumber = $form['invoice_number'] ?? null;
 		$service = (int) $form['service'] ?? 0;
 
@@ -59,12 +59,13 @@ class InvoiceService
 		$cpt_data = [];
     if (is_array($form2)) {
 			foreach ($form2 as $item) {
+				$price = str_replace('.','', $item['cpt_price']);
 				$cpt_data[] = [
 					'cpt_id' => $item['cpt_id'],
 					'cpt_code' => $item['cpt_code'],
 					'cpt_pax' => $item['cpt_pax'],
 					'cpt_desc' => $item['cpt_desc'],
-					'cpt_price' => $item['cpt_price'],
+					'cpt_price' => (int) $price,
 					'cpt_infusion' => $item['cpt_infusion'] ?? '',
 					'cpt_additional' => $item['cpt_additional'] ?? '',
 					'cpt_icd' => $item['cpt_icd']
@@ -86,8 +87,8 @@ class InvoiceService
 										'address' => $address,
 										'phone' => $phoneNumber,
 										'invoice_number' => $invoiceNumber,
-										'complimentary_discount' => $complimentaryDiscount,
-										'medical_team_transport_cost' => $medicalTeamTransportCost,
+										'complimentary_discount' => (int) $complimentaryDiscount,
+										'medical_team_transport_cost' => (int) $medicalTeamTransportCost,
 										'payment_method' => $payment_methods_json,
 										'diagnosis' => $cpt_data_json,
 										'unique_invoice_number' => $uniqueNumbers,
@@ -130,8 +131,8 @@ class InvoiceService
 		$username = $form['username'] ?? null;
     $address 	= $form['address'] ?? null;
     $phoneNumber = $form['phone_number'] ?? null;
-    $complimentaryDiscount = !empty($form['complimentary_discount']) ? $form['complimentary_discount'] : 0;
-    $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? $form['medical_team_transport_cost'] : 0;
+    $complimentaryDiscount = !empty($form['complimentary_discount']) ? str_replace('.','', $form['complimentary_discount']) : 0;
+    $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? str_replace('.','', $form['medical_team_transport_cost']) : 0;
     $invoiceNumber = $form['invoice_number'] ?? null;
 		$invoiceId = decryptID($form['invoice_id']) ?? null;
 		$service = (int) $form['service'] ?? 0;
@@ -148,12 +149,13 @@ class InvoiceService
 		$cpt_data = [];
     if (is_array($form2)) {
 			foreach ($form2 as $item) {
+				$price = str_replace('.','', $item['cpt_price']);
 				$cpt_data[] = [
 					'cpt_id' => $item['cpt_id'],
 					'cpt_code' => $item['cpt_code'],
 					'cpt_pax' => $item['cpt_pax'],
 					'cpt_desc' => $item['cpt_desc'],
-					'cpt_price' => $item['cpt_price'],
+					'cpt_price' => (int) $price,
 					'cpt_infusion' => $item['cpt_infusion'] ?? '',
 					'cpt_additional' => $item['cpt_additional'] ?? '',
 					'cpt_icd' => $item['cpt_icd']
@@ -175,8 +177,8 @@ class InvoiceService
 				'address' => $address,
 				'phone' => $phoneNumber,
 				'invoice_number' => $invoiceNumber,
-				'complimentary_discount' => $complimentaryDiscount,
-				'medical_team_transport_cost' => $medicalTeamTransportCost,
+				'complimentary_discount' => (int) $complimentaryDiscount,
+				'medical_team_transport_cost' => (int) $medicalTeamTransportCost,
 				'payment_method' => $payment_methods_json,
 				'diagnosis' => $cpt_data_json,
 				'unique_invoice_number' => $uniqueNumbers,

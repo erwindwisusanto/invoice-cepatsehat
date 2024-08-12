@@ -114,4 +114,12 @@ if (!function_exists('numberToWords')) {
 			return $service->name;
 		}
 	}
+
+	if (!function_exists('formatCurrency')) {
+		function formatCurrency($input) {
+			$value = preg_replace('/[^0-9]/', '', $input);
+			$formattedValue = number_format($value, 0, ',', '.');
+			return $formattedValue;
+		}
+	}
 }
