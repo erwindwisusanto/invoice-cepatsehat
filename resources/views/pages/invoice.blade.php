@@ -160,6 +160,7 @@
 			processing: false,
 			serverSide: true,
 			responsive: true,
+			order: [[0, 'desc']],
 			dom: 'rtp',
 			ajax: '{{ route('invoices') }}',
 			columns: [
