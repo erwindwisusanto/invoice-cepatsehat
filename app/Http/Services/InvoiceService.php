@@ -133,7 +133,6 @@ class InvoiceService
     $phoneNumber = $form['phone_number'] ?? null;
     $complimentaryDiscount = !empty($form['complimentary_discount']) ? str_replace('.','', $form['complimentary_discount']) : 0;
     $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? str_replace('.','', $form['medical_team_transport_cost']) : 0;
-    $invoiceNumber = $form['invoice_number'] ?? null;
 		$invoiceId = decryptID($form['invoice_id']) ?? null;
 		$service = (int) $form['service'] ?? 0;
 
@@ -163,8 +162,6 @@ class InvoiceService
 			}
     }
 
-		$uniqueNumbers = $this->getLatestUniqueNumber();
-
 		$payment_methods_json = json_encode($payment_methods);
     $cpt_data_json = json_encode($cpt_data);
 
@@ -176,12 +173,10 @@ class InvoiceService
 				'username' => $username,
 				'address' => $address,
 				'phone' => $phoneNumber,
-				'invoice_number' => $invoiceNumber,
 				'complimentary_discount' => (int) $complimentaryDiscount,
 				'medical_team_transport_cost' => (int) $medicalTeamTransportCost,
 				'payment_method' => $payment_methods_json,
 				'diagnosis' => $cpt_data_json,
-				'unique_invoice_number' => $uniqueNumbers,
 				'status' => $status,
 				'service' => $service,
 				'created_at' => Carbon::now(),
@@ -199,7 +194,7 @@ class InvoiceService
 
 			return [
 				'success' => true,
-				'message' => 'success create new invoice',
+				'message' => 'success',
 				'isDraft' => $status,
 			];
 		} catch (\Exception $e) {
