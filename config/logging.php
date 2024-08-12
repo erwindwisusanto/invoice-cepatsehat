@@ -41,6 +41,12 @@ return [
             'ignore_exceptions' => false,
         ],
 
+				'qontak' => [
+						'driver' => 'single',
+						'path' => storage_path('logs/qontak.log'),
+						'level' => 'info',
+				],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),

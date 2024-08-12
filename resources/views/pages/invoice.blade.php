@@ -232,7 +232,7 @@
 			var fixJson = rowData?.diagnosis.replace(/&quot;/g, '"');
 
 			$('#offcanvasDetailLabel').html(`
-				No Invoice: <a href="/invoice/${invoiceId}" target="_blank">${invoiceNumber}</a> ${statusInvoice(parseInt(status))}
+				No Invoice: <a href="/invoice/${invoiceId}?view=8FxU0" target="_blank">${invoiceNumber}</a> ${statusInvoice(parseInt(status))}
 				<p class="fs-12 text-muted mb-0">${formatingDate(date)}</p>
 			`);
 

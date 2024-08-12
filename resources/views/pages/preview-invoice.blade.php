@@ -104,7 +104,7 @@
 					<span>Said: <span class="fw-semibold fst-italic">{{ numberToWords($price)}} Rupiahs</span></span>
 				</div>
 				<div class="row mt-5 gx-0">
-					<div class="col-6">
+					<div class="col-5">
 						<div class="row">
 							<span class="fw-semibold">Clinic Cepat Sehat</span>
 						</div>
@@ -113,7 +113,7 @@
 							<span class="fw-semibold">General Practitioner</span>
 						</div>
 					</div>
-					<div class="col-6">
+					<div class="col-6 offset-1">
 						<div class="row">
 							<span>For payment please wired to :</span>
 						</div>
@@ -126,6 +126,22 @@
 						</div>
 					</div>
 				</div>
+				@if (request()->query('view') === "oYR7Y")
+					<div class="row gx-0 d-flex justify-content-center" style="margin-top: 5vh">
+						<div class="col-5">
+							<button type="submit" class="btn btn-primary w-100" id="">
+								Accept &nbsp;
+								<span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+							</button>
+						</div>
+						<div class="col-5 offset-1">
+							<button type="submit" class="btn btn-primary w-100" id="">
+								Reject &nbsp;
+								<span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+							</button>
+						</div>
+					</div>
+				@endif
 			</div>
 		</div>
 	</div>

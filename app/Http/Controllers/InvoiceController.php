@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\InvoiceService;
+use App\Http\Services\QontakService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -11,9 +12,11 @@ class InvoiceController extends Controller
 {
 
 	protected $invoiceService;
-	public function __construct(InvoiceService $invoiceService)
+	protected $qontakService;
+	public function __construct(InvoiceService $invoiceService, QontakService $qontakService)
 	{
 		$this->invoiceService = $invoiceService;
+		$this->qontakService = $qontakService;
 	}
 
 	public function view_invoice()
@@ -40,8 +43,9 @@ class InvoiceController extends Controller
 		$icdxs = $this->invoiceService->ListIcdxs();
 		$cpts = $this->invoiceService->ListCpts();
 		$infusions = $this->invoiceService->getInfusions();
+		$services = $this->invoiceService->ListServices();
 
-		return view('pages.new-invoice', compact('invoiceNumber', 'date', 'paymentMethods', 'icdxs', 'cpts', 'infusions'));
+		return view('pages.new-invoice', compact('invoiceNumber', 'date', 'paymentMethods', 'icdxs', 'cpts', 'infusions', 'services'));
 	}
 
 	public function createNewInvoice(Request $request)
@@ -104,11 +108,13 @@ class InvoiceController extends Controller
 		$diagnosis = json_decode($invoice->diagnosis) ?? [];
 		$username = $invoice->username;
 		$invoiceId = encryptID($invoice->id);
+		$service_selected = (int) $invoice->service;
 
 		$paymentMethods = $this->invoiceService->ListPaymentMethod();
 		$infusions = $this->invoiceService->getInfusions();
 		$icdxs = $this->invoiceService->ListIcdxs();
 		$cpts = $this->invoiceService->ListCpts();
+		$services = $this->invoiceService->ListServices();
 
 		return view('pages.draft-invoice',
 			compact(
@@ -125,13 +131,20 @@ class InvoiceController extends Controller
 				'cpts',
 				'username',
 				'infusions',
-				'invoiceId'
+				'invoiceId',
+				'services',
+				'service_selected'
 				)
 		);
 	}
 
-	public function viewInvoiceGuest($invoiceId)
+	public function viewInvoiceGuest(Request $request, $invoiceId)
 	{
+
+		if (!$request->query('view')) {
+			return redirect()->route('view_invoice');
+		}
+
 		$invoice = $this->invoiceService->getInvoice(decryptID($invoiceId));
 
 		$invoiceNumber = $invoice->invoice_number;

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
+
 if (!function_exists('encryptID')) {
 	function encryptID($string)
 	{
@@ -103,5 +105,13 @@ if (!function_exists('numberToWords')) {
 		}
 
 		return $result;
+	}
+
+	if (!function_exists('getServiceName')) {
+		function getServiceName($serviceId)
+		{
+			$service = DB::table('service')->select('name')->where('id', $serviceId)->first();
+			return $service->name;
+		}
 	}
 }

@@ -6,6 +6,13 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceService
 {
+
+	protected $qontakService;
+	public function __construct(QontakService $qontakService)
+	{
+		$this->qontakService = $qontakService;
+	}
+
 	public function ListPaymentMethod()
 	{
 		$paymentMethods = DB::table('payment')->where('is_active', 1)->get();
@@ -24,6 +31,12 @@ class InvoiceService
 		return $cpt;
 	}
 
+	public function ListServices()
+	{
+		$cpt = DB::table('service')->get();
+		return $cpt;
+	}
+
 	public function saveNewInvoice($form, $form2, $buttonType)
 	{
 		$username = $form['username'] ?? null;
@@ -32,10 +45,11 @@ class InvoiceService
     $complimentaryDiscount = !empty($form['complimentary_discount']) ? $form['complimentary_discount'] : 0;
     $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? $form['medical_team_transport_cost'] : 0;
     $invoiceNumber = $form['invoice_number'] ?? null;
+		$service = (int) $form['service'] ?? 0;
 
 		$statusDraft = 1;
 		$statusOnProccess = 2;
-		$status = $buttonType === "NEW" ? $statusOnProccess : $statusDraft;
+		$status = $buttonType === "NEW" ? (int) $statusOnProccess : (int) $statusDraft;
 
 		$payment_methods = [];
     if (isset($form['payment_method']) && is_array($form['payment_method'])) {
@@ -67,22 +81,30 @@ class InvoiceService
 
 		try {
 			sleep(1);
-			DB::table('invoice')->insert([
-				'username' => $username,
-				'address' => $address,
-				'phone' => $phoneNumber,
-				'invoice_number' => $invoiceNumber,
-				'complimentary_discount' => $complimentaryDiscount,
-				'medical_team_transport_cost' => $medicalTeamTransportCost,
-				'payment_method' => $payment_methods_json,
-				'diagnosis' => $cpt_data_json,
-				'unique_invoice_number' => $uniqueNumbers,
-				'status' => $status,
-				'created_at' => Carbon::now(),
-				'updated_at' => Carbon::now(),
-			]);
+			$invoiceId = DB::table('invoice')->insertGetId([
+										'username' => $username,
+										'address' => $address,
+										'phone' => $phoneNumber,
+										'invoice_number' => $invoiceNumber,
+										'complimentary_discount' => $complimentaryDiscount,
+										'medical_team_transport_cost' => $medicalTeamTransportCost,
+										'payment_method' => $payment_methods_json,
+										'diagnosis' => $cpt_data_json,
+										'unique_invoice_number' => $uniqueNumbers,
+										'status' => $status,
+										'service' => $service,
+										'created_at' => Carbon::now(),
+										'updated_at' => Carbon::now(),
+									]);
 
 			DB::commit();
+
+			if ($status == 2) {
+				$doctorName = "Erwin";
+				$doctorPhoneNumber = "6282110796637";
+				$invoice = $this->getInvoiceById($invoiceId);
+				$this->qontakService->sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
+			}
 
 			return [
 				'success' => true,
@@ -98,6 +120,11 @@ class InvoiceService
 		}
 	}
 
+	private function getInvoiceById($invoiceId)
+	{
+		return DB::table('invoice')->where('id', $invoiceId)->first();
+	}
+
 	public function updateInvoice($form, $form2, $buttonType)
 	{
 		$username = $form['username'] ?? null;
@@ -107,6 +134,7 @@ class InvoiceService
     $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? $form['medical_team_transport_cost'] : 0;
     $invoiceNumber = $form['invoice_number'] ?? null;
 		$invoiceId = decryptID($form['invoice_id']) ?? null;
+		$service = (int) $form['service'] ?? 0;
 
 		$statusDraft = 1;
 		$statusOnProccess = 2;
@@ -153,11 +181,19 @@ class InvoiceService
 				'diagnosis' => $cpt_data_json,
 				'unique_invoice_number' => $uniqueNumbers,
 				'status' => $status,
+				'service' => $service,
 				'created_at' => Carbon::now(),
 				'updated_at' => Carbon::now(),
 			]);
 
 			DB::commit();
+
+			if ($status == 2) {
+				$doctorName = "Erwin";
+				$doctorPhoneNumber = "6282110796637";
+				$invoice = $this->getInvoiceById($invoiceId);
+				$this->qontakService->sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
+			}
 
 			return [
 				'success' => true,

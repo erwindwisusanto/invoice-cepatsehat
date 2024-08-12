@@ -104,6 +104,14 @@
 						@endforeach
 					</select>
 				</div>
+				<div class="mb-4">
+					<label for="service" class="form-label">Service</label>
+					<select class="form-select" id="service" name="service" data-placeholder="Choose Service">
+						@foreach($services as $service)
+							<option value="{{ $service->id }}" {{ (int) $service->id === $service_selected ? 'selected' : '' }}>{{ $service->name }}</option>
+						@endforeach
+					</select>
+				</div>
 				<div class="row gx-2">
 					<div class="col-6">
 						<button type="submit" class="btn btn-outline-primary w-100" id="submit-draft-invoice" data-is-draft="true">
@@ -578,6 +586,8 @@
 			placeholder: $( this ).data( 'placeholder' ),
 			closeOnSelect: true,
 		});
+
+		$('#service').select2();
 
 		var selectedMethods = {{ $paymentMethodSelected ?? [] }};
 		$('#payment_method').val(selectedMethods).trigger('change');
