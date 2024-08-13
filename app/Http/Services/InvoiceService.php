@@ -84,6 +84,7 @@ class InvoiceService
 		try {
 			sleep(1);
 			$invoiceId = DB::table('invoice')->insertGetId([
+										'user_id' => auth()->user()->id,
 										'username' => $username,
 										'address' => $address,
 										'phone' => $phoneNumber,
@@ -101,12 +102,12 @@ class InvoiceService
 
 			DB::commit();
 
-			// if ($status == 2) {
-			// 	$doctorName = "Erwin";
-			// 	$doctorPhoneNumber = "6282110796637";
-			// 	$invoice = $this->getInvoiceById($invoiceId);
-			// 	$this->qontakService->sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
-			// }
+			if ($status == 2) {
+				$doctorName = "Erwin";
+				$doctorPhoneNumber = "6282110796637";
+				$invoice = $this->getInvoiceById($invoiceId);
+				$this->qontakService->sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
+			}
 
 			return [
 				'success' => true,
@@ -171,6 +172,7 @@ class InvoiceService
 		try {
 			sleep(1);
 			DB::table('invoice')->where('id', $invoiceId)->update([
+				'user_id' => auth()->user()->id,
 				'username' => $username,
 				'address' => $address,
 				'phone' => $phoneNumber,
@@ -185,12 +187,12 @@ class InvoiceService
 
 			DB::commit();
 
-			// if ($status == 2) {
-			// 	$doctorName = "Erwin";
-			// 	$doctorPhoneNumber = "6282110796637";
-			// 	$invoice = $this->getInvoiceById($invoiceId);
-			// 	$this->qontakService->sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
-			// }
+			if ($status == 2) {
+				$doctorName = "Erwin";
+				$doctorPhoneNumber = "6282110796637";
+				$invoice = $this->getInvoiceById($invoiceId);
+				$this->qontakService->sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
+			}
 
 			return [
 				'success' => true,
