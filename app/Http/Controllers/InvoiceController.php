@@ -190,6 +190,8 @@ class InvoiceController extends Controller
 		$complimentaryDiscount = $invoice->complimentary_discount;
 		$medicalTeamTransportCost = $invoice->medical_team_transport_cost;
 
+		$paymentMethod = $this->invoiceService->paymentMethodName(json_decode($invoice->payment_method));
+
 		$data = [
 			'invoiceNumber' => $invoiceNumber,
 			'date' => $date,
@@ -198,6 +200,7 @@ class InvoiceController extends Controller
 			'diagnosis' => $diagnosis,
 			'complimentaryDiscount' => $complimentaryDiscount,
 			'medicalTeamTransportCost' => $medicalTeamTransportCost,
+			'paymentMethod' => $paymentMethod
 		];
 
 		$filename = "invoice-$invoiceId.pdf";

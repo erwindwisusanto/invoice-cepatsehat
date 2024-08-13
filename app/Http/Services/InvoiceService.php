@@ -409,4 +409,19 @@ class InvoiceService
 			];
 		}
 	}
+
+	public function paymentMethodName($data)
+	{
+		$data = (array) $data;
+    try {
+			$paymentMethods = DB::table('payment')
+					->whereIn('id', $data)
+					->pluck('name', 'id');
+
+			return $paymentMethods->toArray();
+
+    } catch (\Exception $e) {
+      return [];
+    }
+	}
 }

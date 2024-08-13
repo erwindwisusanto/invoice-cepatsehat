@@ -145,11 +145,11 @@
                 <table class="table table-bordered border-csi">
                     <thead class="thead-light">
                         <tr>
-                            <th class="align-middle text-center">CPT Code</th>
-                            <th class="align-middle text-center" style="width: 40%">Item Description</th>
+                            <th class="align-middle text-center" style="width: 10%;">CPT Code</th>
+                            <th class="align-middle text-center" style="width: 45%">Item Description</th>
                             <th class="align-middle text-center" style="width: 10%">ICD10 Code</th>
-                            <th class="align-middle text-center">Pax</th>
-                            <th class="align-middle text-center">Total</th>
+                            <th class="align-middle text-center" style="width: 8%">Pax</th>
+                            <th class="align-middle text-center" style="width: 25%">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -196,27 +196,39 @@
                         @endforeach
                         <tr>
                             <td></td>
-                            <td><span class="fw-semibold">Complimentary disc</span></td>
+                            <td class="text-right"><span class="fw-semibold"><b>Complimentary disc</b></span></td>
                             <td></td>
                             <td></td>
                             <td><span>Rp {{ number_format($complimentaryDiscount) }}</span></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><span class="fw-semibold">Med. team transport cost</span></td>
+                            <td class="text-right"><span class="fw-semibold"><b>Med. team transport cost</b></span></td>
                             <td></td>
                             <td></td>
                             <td><span>Rp {{ number_format($medicalTeamTransportCost) }}</span></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><span class="fw-semibold"><b>Total</b></span></td>
+                            <td class="text-right"><span class="fw-semibold"><b>Total</b></span></td>
                             <td></td>
                             <td></td>
                             <td><span class="fw-semibold"><b>Rp
                                     {{ number_format($totalPrice - $complimentaryDiscount + $medicalTeamTransportCost) }}</b></span>
                             </td>
                         </tr>
+												<tr>
+													<td></td>
+													<td class="text-right"><span class="fw-semibold"><b>Payment Method</b></span></td>
+													<td></td>
+													<td></td>
+													<td><span class="fw-semibold">
+														@foreach ($paymentMethod as $index => $payment)
+																<b>{{ $payment }}@if (!$loop->last), @endif</b>
+														@endforeach
+												</span>
+												</td>
+											</tr>
                     </tbody>
                 </table>
                 <div class="mt-4">
