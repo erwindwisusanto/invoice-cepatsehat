@@ -236,7 +236,7 @@ class InvoiceService
 	public function GetInvoices()
 	{
 		try {
-			$invoices = DB::table('invoice')->orderByDesc('created_at')->get();
+			$invoices = DB::table('invoice')->where('user_id', auth()->user()->id)->orderByDesc('created_at')->get();
 			foreach ($invoices as $invoice) {
 				$invoice->id = encryptId($invoice->id);
 			}
