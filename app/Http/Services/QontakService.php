@@ -46,7 +46,7 @@ class QontakService
 		}
 	}
 
-	public function sendWhatsAppMessageDoctor(string $doctorPhoneNumber, string $doctorName, string $patientName, int $service, string $datetime, $invoiceId)
+	public function sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $patientName, $service, $datetime, $invoiceId)
 	{
 		$data = [
 			'key' => config('key.QONTAK_NURSE_TO_DOCTOR_KEY'),
