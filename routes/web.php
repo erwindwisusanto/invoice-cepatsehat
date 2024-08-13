@@ -29,5 +29,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/invoice/{id}', [InvoiceController::class, 'viewInvoiceGuest'])->name('view_invoice_guest');
 Route::post('doctor-action', [InvoiceController::class, 'doctorAction'])->name('doctor-action')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
+Route::get('pdf/{id}', [InvoiceController::class, 'viewInvoicePatient'])->name('view_invoice_patient');
+
 
 

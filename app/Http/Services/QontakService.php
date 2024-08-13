@@ -92,4 +92,45 @@ class QontakService
 		return $this->send($data);
 	}
 
+	public function sendWhatsAppMessagePatient($phonenumber, $name, $service, $datetime, $invoiceId)
+	{
+		$data = [
+			'key' => config('key.QONTAK_DOCTOR_TO_PATIENT_KEY'),
+			'to_number' => $phonenumber,
+			'to_name' => $name,
+			'message_template_id' => config('key.QONTAK_TEMPLATE_MESSAGE_PATIENT'),
+			'channel_integration_id' => config('key.QONTAK_CHANEL_INTEGRATION_ID'),
+			'lang_code' => 'en',
+			'body' => [
+				[
+					'key' => '1',
+					'value' => 'patient_name',
+					'value_text' => $name
+				],
+				[
+					'key' => '2',
+					'value' => 'service_name',
+					'value_text' => getServiceName($service)
+				],
+				[
+					'key' => '3',
+					'value' => 'date_request',
+					'value_text' => Carbon::parse($datetime)->toDateString()
+				],
+				[
+					'key' => '4',
+					'value' => 'time_request',
+					'value_text' => Carbon::parse($datetime)->format('H:i')
+				],
+				[
+					'key' => '5',
+					'value' => 'url_pdf',
+					'value_text' => request()->getSchemeAndHttpHost() . "/pdf/" . encryptID($invoiceId)
+				]
+			],
+		];
+
+		return $this->send($data);
+	}
+
 }

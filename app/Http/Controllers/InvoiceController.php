@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\InvoiceService;
 use App\Http\Services\QontakService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -176,7 +177,36 @@ class InvoiceController extends Controller
 		$invoiceId = $request->invoice_id;
 
 		if ($status === "ACCEPT") {
-			$this->invoiceService->Accept($invoiceId);
+			dd($this->invoiceService->Accept($invoiceId));
 		}
+	}
+
+	public function viewInvoicePatient($invoiceId)
+	{
+		$invoice = $this->invoiceService->getInvoice(decryptID($invoiceId));
+
+		$invoiceNumber = $invoice->invoice_number;
+		$date = Carbon::parse($invoice->created_at)->format('F, j Y');
+		$username = $invoice->username;
+		$address = $invoice->address;
+		$diagnosis = json_decode($invoice->diagnosis) ?? [];
+		$complimentaryDiscount = $invoice->complimentary_discount;
+		$medicalTeamTransportCost = $invoice->medical_team_transport_cost;
+
+		$data = [
+			'invoiceNumber' => $invoiceNumber,
+			'date' => $date,
+			'username' => $username,
+			'address' => $address,
+			'diagnosis' => $diagnosis,
+			'complimentaryDiscount' => $complimentaryDiscount,
+			'medicalTeamTransportCost' => $medicalTeamTransportCost,
+		];
+
+		$filename = "invoice-$invoiceId.pdf";
+		return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
+		->setPaper('A4')
+		->loadView('pdf.invoice', $data)
+		->stream($filename);
 	}
 }

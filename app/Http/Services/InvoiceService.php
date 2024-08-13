@@ -3,6 +3,7 @@ namespace App\Http\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class InvoiceService
 {
@@ -100,12 +101,12 @@ class InvoiceService
 
 			DB::commit();
 
-			if ($status == 2) {
-				$doctorName = "Erwin";
-				$doctorPhoneNumber = "6282110796637";
-				$invoice = $this->getInvoiceById($invoiceId);
-				$this->qontakService->sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
-			}
+			// if ($status == 2) {
+			// 	$doctorName = "Erwin";
+			// 	$doctorPhoneNumber = "6282110796637";
+			// 	$invoice = $this->getInvoiceById($invoiceId);
+			// 	$this->qontakService->sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
+			// }
 
 			return [
 				'success' => true,
@@ -185,12 +186,12 @@ class InvoiceService
 
 			DB::commit();
 
-			if ($status == 2) {
-				$doctorName = "Erwin";
-				$doctorPhoneNumber = "6282110796637";
-				$invoice = $this->getInvoiceById($invoiceId);
-				$this->qontakService->sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
-			}
+			// if ($status == 2) {
+			// 	$doctorName = "Erwin";
+			// 	$doctorPhoneNumber = "6282110796637";
+			// 	$invoice = $this->getInvoiceById($invoiceId);
+			// 	$this->qontakService->sendWhatsAppMessageDoctor($doctorPhoneNumber, $doctorName, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
+			// }
 
 			return [
 				'success' => true,
@@ -276,14 +277,37 @@ class InvoiceService
 
 	public function Accept($invoiceId)
 	{
-		$updateStatus = $this->updateStatusInvoiceToDone(decryptID($invoiceId));
-		if ($updateStatus) {
+		try {
+			$updateStatus = $this->updateStatusInvoiceToDone($invoiceId);
 
+			if ($updateStatus) {
+				$xx = $this->sendWhatsappToPatient($invoiceId);
+			}
+
+			return true;
+		} catch (\Exception $e) {
+			return false;
 		}
+	}
+
+	private function sendWhatsappToPatient($invoiceId)
+	{
+		$decryptId = decryptID($invoiceId);
+		$invoice = $this->getInvoiceById($decryptId);
+		$this->qontakService->sendWhatsAppMessagePatient($invoice->phone, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
 	}
 
 	private function updateStatusInvoiceToDone($invoiceId)
 	{
-		return DB::table('invoice')->where('id', $invoiceId)->update(['status' => 3]);
+		try {
+			DB::beginTransaction();
+			DB::table('invoice')->where('id', decryptID($invoiceId))->update(['status' => 3]);
+			DB::commit();
+
+			return true;
+		} catch (\Exception $e) {
+			DB::rollBack();
+			return false;
+		}
 	}
 }

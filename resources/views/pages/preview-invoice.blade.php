@@ -11,8 +11,8 @@
 						<h6 class="fw-semibold" style="color: #007A7D;">NEW INVOICE</h6>
 				</div>
 				<div class="col-12 text-right invoice-details">
-						<span class="d-block fs-14 text-muted">Invoice Number: 0001/CSI/VII/2024</span>
-						<span class="d-block fs-14 text-muted">Date: July 8, 2024</span>
+						<span class="d-block fs-14 text-muted">Invoice Number: {{ $invoiceNumber }}</span>
+						<span class="d-block fs-14 text-muted">Date: {{ $date }}</span>
 				</div>
 			</div>
 			<div class="row mt-3">
@@ -127,17 +127,17 @@
 					</div>
 				</div>
 				@if (request()->query('view') === "oYR7Y")
-					<div class="row gx-0 d-flex justify-content-center" style="margin-top: 5vh">
+					<div class="row gx-0 d-flex justify-content-center" style="margin-top: 5vh; margin-bottom: 5vh">
 						<div class="col-5">
-							<button onclick="submitHandler('ACCEPT', '{{ $invoiceId }}')" class="btn btn-primary w-100" id="">
+							<button onclick="submitHandler('ACCEPT', '{{ $invoiceId }}', 'accept-button', 'loading-spinner-accept')" class="btn btn-primary w-100" id="">
 								Accept &nbsp;
-								<span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+								<span id="loading-spinner-accept" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
 							</button>
 						</div>
 						<div class="col-5 offset-1">
-							<button onclick="submitHandler('REJECT', '{{ $invoiceId }}')" class="btn btn-primary w-100" id="">
+							<button onclick="submitHandler('REJECT', '{{ $invoiceId }}', 'reject-button', 'loading-spinner-reject')" class="btn btn-primary w-100" id="">
 								Reject &nbsp;
-								<span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+								<span id="loading-spinner-reject" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
 							</button>
 						</div>
 					</div>
@@ -149,7 +149,12 @@
 <script>
 	'use strict';
 
-	const submitHandler = async (status, invoiceId) => {
+	const submitHandler = async (status, invoiceId, buttonId, spinnerId) => {
+		const $button = $('#' + buttonId);
+    const $spinner = $('#' + spinnerId);
+
+		$spinner.removeClass('d-none');
+		$button.prop('disabled', true);
 		try {
 			const response = await $.ajax({
 				url: `{{ route('doctor-action') }}`,
@@ -159,10 +164,13 @@
 					invoice_id: invoiceId
 				}
 			});
+
+			console.log(response);
 		} catch (error) {
-
+			console.error(error);
 		} finally {
-
+			$spinner.addClass('d-none');
+			$button.prop('disabled', false);
 		}
 	}
 </script>
