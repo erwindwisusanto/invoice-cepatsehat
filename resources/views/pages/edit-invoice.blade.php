@@ -115,15 +115,15 @@
 					</select>
 				</div>
 				<div class="row gx-2">
-					<div class="col-6">
+					{{-- <div class="col-6">
 						<button type="submit" class="btn btn-outline-primary w-100" id="submit-draft-invoice" data-is-draft="true">
 							Save as Draft &nbsp;
 							<span id="loading-spinner-invoice-draft" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
 						</button>
-					</div>
-					<div class="col-6">
+					</div> --}}
+					<div class="col-12">
 						<button type="submit" class="btn btn-primary w-100" id="submit-new-invoice" data-is-draft="false">
-							Submit &nbsp;
+							Save &nbsp;
 							<span id="loading-spinner-invoice" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
 						</button>
 					</div>
