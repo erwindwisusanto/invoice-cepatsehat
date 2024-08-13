@@ -91,6 +91,9 @@ class InvoiceController extends Controller
 	public function invoices()
 	{
 		$invoices = $this->invoiceService->GetInvoices();
+		if ($invoices->isEmpty()) {
+			return DataTables::of([])->make(true);
+		}
 		return DataTables::of($invoices)->make(true);
 	}
 
