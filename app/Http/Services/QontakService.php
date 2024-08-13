@@ -99,7 +99,7 @@ class QontakService
 			'to_number' => $phonenumber,
 			'to_name' => $name,
 			'message_template_id' => config('key.QONTAK_TEMPLATE_MESSAGE_PATIENT'),
-			'channel_integration_id' => config('key.QONTAK_CHANEL_INTEGRATION_ID'),
+			'channel_integration_id' => config('key.QONTAK_CHANEL_INTEGRATION_ID_PATIENT'),
 			'lang_code' => 'en',
 			'body' => [
 				[
