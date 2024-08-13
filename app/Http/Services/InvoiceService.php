@@ -180,7 +180,6 @@ class InvoiceService
 				'diagnosis' => $cpt_data_json,
 				'status' => $status,
 				'service' => $service,
-				'created_at' => Carbon::now(),
 				'updated_at' => Carbon::now(),
 			]);
 
@@ -281,7 +280,22 @@ class InvoiceService
 			$updateStatus = $this->updateStatusInvoiceToDone($invoiceId);
 
 			if ($updateStatus) {
-				$xx = $this->sendWhatsappToPatient($invoiceId);
+				$this->sendWhatsappToPatient($invoiceId);
+			}
+
+			return true;
+		} catch (\Exception $e) {
+			return false;
+		}
+	}
+
+	public function EditInvoice($invoiceId)
+	{
+		try {
+			$updateStatus = $this->updateStatusInvoiceToEditForDoctor($invoiceId);
+
+			if (!$updateStatus) {
+				return false;
 			}
 
 			return true;
@@ -297,6 +311,20 @@ class InvoiceService
 		$this->qontakService->sendWhatsAppMessagePatient($invoice->phone, $invoice->username, $invoice->service, $invoice->created_at, $invoice->id);
 	}
 
+	private function updateStatusInvoiceToEditForDoctor($invoiceId)
+	{
+		try {
+			DB::beginTransaction();
+			DB::table('invoice')->where('id', decryptID($invoiceId))->update(['status' => 4]);
+			DB::commit();
+
+			return true;
+		} catch (\Exception $e) {
+			DB::rollBack();
+			return false;
+		}
+	}
+
 	private function updateStatusInvoiceToDone($invoiceId)
 	{
 		try {
@@ -308,6 +336,76 @@ class InvoiceService
 		} catch (\Exception $e) {
 			DB::rollBack();
 			return false;
+		}
+	}
+
+	public function updateInvoiceDoctor($form, $form2)
+	{
+		$username = $form['username'] ?? null;
+    $address 	= $form['address'] ?? null;
+    $phoneNumber = $form['phone_number'] ?? null;
+    $complimentaryDiscount = !empty($form['complimentary_discount']) ? str_replace('.','', $form['complimentary_discount']) : 0;
+    $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? str_replace('.','', $form['medical_team_transport_cost']) : 0;
+		$invoiceId = decryptID($form['invoice_id']) ?? null;
+		$service = (int) $form['service'] ?? 0;
+
+		$status = 2;
+
+		$payment_methods = [];
+    if (isset($form['payment_method']) && is_array($form['payment_method'])) {
+      $payment_methods = array_map('intval', $form['payment_method']);
+    }
+
+		$cpt_data = [];
+    if (is_array($form2)) {
+			foreach ($form2 as $item) {
+				$price = str_replace('.','', $item['cpt_price']);
+				$cpt_data[] = [
+					'cpt_id' => $item['cpt_id'],
+					'cpt_code' => $item['cpt_code'],
+					'cpt_pax' => $item['cpt_pax'],
+					'cpt_desc' => $item['cpt_desc'],
+					'cpt_price' => (int) $price,
+					'cpt_infusion' => $item['cpt_infusion'] ?? '',
+					'cpt_additional' => $item['cpt_additional'] ?? '',
+					'cpt_icd' => $item['cpt_icd']
+				];
+			}
+    }
+
+		$payment_methods_json = json_encode($payment_methods);
+    $cpt_data_json = json_encode($cpt_data);
+
+		DB::beginTransaction();
+
+		try {
+			sleep(1);
+			DB::table('invoice')->where('id', $invoiceId)->update([
+				'username' => $username,
+				'address' => $address,
+				'phone' => $phoneNumber,
+				'complimentary_discount' => (int) $complimentaryDiscount,
+				'medical_team_transport_cost' => (int) $medicalTeamTransportCost,
+				'payment_method' => $payment_methods_json,
+				'diagnosis' => $cpt_data_json,
+				'status' => $status,
+				'service' => $service,
+				'updated_at' => Carbon::now(),
+			]);
+
+			DB::commit();
+
+			return [
+				'success' => true,
+				'message' => 'success',
+				'isDraft' => $status,
+			];
+		} catch (\Exception $e) {
+			DB::rollBack();
+			return [
+				'success' => false,
+				'message' => $e->getMessage(),
+			];
 		}
 	}
 }

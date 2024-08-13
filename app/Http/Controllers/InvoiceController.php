@@ -148,6 +148,10 @@ class InvoiceController extends Controller
 
 		$invoice = $this->invoiceService->getInvoice(decryptID($invoiceId));
 
+		if ($invoice->status === 3) {
+			return redirect()->route('view_invoice_approved');
+		}
+
 		$invoiceNumber = $invoice->invoice_number;
 		$date = Carbon::parse($invoice->created_at)->format('F, j Y');
 		$username = $invoice->username;
@@ -169,16 +173,6 @@ class InvoiceController extends Controller
 				'invoiceId'
 			)
 		);
-	}
-
-	public function doctorAction(Request $request)
-	{
-		$status = $request->status;
-		$invoiceId = $request->invoice_id;
-
-		if ($status === "ACCEPT") {
-			dd($this->invoiceService->Accept($invoiceId));
-		}
 	}
 
 	public function viewInvoicePatient($invoiceId)
@@ -208,5 +202,10 @@ class InvoiceController extends Controller
 		->setPaper('A4')
 		->loadView('pdf.invoice', $data)
 		->stream($filename);
+	}
+
+	public function viewInvoiceApproved()
+	{
+		return view('pages.approved');
 	}
 }

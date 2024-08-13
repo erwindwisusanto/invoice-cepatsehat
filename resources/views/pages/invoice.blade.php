@@ -134,6 +134,9 @@
 			case 3:
 				name = 'Done';
 				classNamebadge = 'badge badge-success';
+			case 4:
+				name = 'On Progress';
+				classNamebadge = 'badge badge-progress';
 				break;
 			default:
 				name = 'Unknown';

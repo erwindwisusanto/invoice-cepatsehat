@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,10 +27,16 @@ Route::middleware('auth')->group(function () {
 	Route::post('/new-invoice', [InvoiceController::class, 'createNewInvoice'])->name('post_new_invoice');
 });
 
+// GUEST FOR PATIENT & DOCTOR
+Route::get('invoice-approved', [InvoiceController::class, 'viewInvoiceApproved'])->name('view_invoice_approved');
 Route::get('/invoice/{id}', [InvoiceController::class, 'viewInvoiceGuest'])->name('view_invoice_guest');
-Route::post('doctor-action', [InvoiceController::class, 'doctorAction'])->name('doctor-action')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
-
 Route::get('pdf/{id}', [InvoiceController::class, 'viewInvoicePatient'])->name('view_invoice_patient');
 
+
+
+// DOCTOR ONLY
+Route::post('save-invoice', [DoctorController::class, 'saveInvoiceDoctor'])->name('save_invoice_doctor');
+Route::get('edit-invoice/{id}', [DoctorController::class, 'viewEditInvoiceDoctor'])->name('view_edit_invoice_doctor');
+Route::post('doctor-action', [DoctorController::class, 'doctorAction'])->name('doctor-action')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
 

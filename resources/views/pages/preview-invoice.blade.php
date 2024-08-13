@@ -135,8 +135,8 @@
 							</button>
 						</div>
 						<div class="col-5 offset-1">
-							<button onclick="submitHandler('REJECT', '{{ $invoiceId }}', 'reject-button', 'loading-spinner-reject')" class="btn btn-primary w-100" id="">
-								Reject &nbsp;
+							<button onclick="submitHandler('REJECT', '{{ $invoiceId }}', 'reject-button', 'loading-spinner-reject')" class="btn btn-outline-primary w-100" id="">
+								Edit &nbsp;
 								<span id="loading-spinner-reject" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
 							</button>
 						</div>
@@ -150,11 +150,10 @@
 	'use strict';
 
 	const submitHandler = async (status, invoiceId, buttonId, spinnerId) => {
-		const $button = $('#' + buttonId);
-    const $spinner = $('#' + spinnerId);
-
-		$spinner.removeClass('d-none');
-		$button.prop('disabled', true);
+		const button = $('#' + buttonId);
+    const spinner = $('#' + spinnerId);
+		spinner.removeClass('d-none');
+		button.prop('disabled', true);
 		try {
 			const response = await $.ajax({
 				url: `{{ route('doctor-action') }}`,
@@ -165,12 +164,18 @@
 				}
 			});
 
-			console.log(response);
+			if (response.success == true && response.type == 'ACCEPT') {
+				window.location.reload();
+			}
+
+			if (response.success == true && response.type == 'EDIT') {
+				window.location.href = '{{ route('view_edit_invoice_doctor', ['id' => $invoiceId]) }}';
+			}
+
 		} catch (error) {
-			console.error(error);
 		} finally {
-			$spinner.addClass('d-none');
-			$button.prop('disabled', false);
+			spinner.addClass('d-none');
+			button.prop('disabled', false);
 		}
 	}
 </script>
