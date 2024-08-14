@@ -173,3 +173,7 @@
 	--bs-border-opacity: 1;
 	border-color: #04B4B9 !important;
 }
+
+.dataTables_wrapper table thead{
+	display:none;
+}
