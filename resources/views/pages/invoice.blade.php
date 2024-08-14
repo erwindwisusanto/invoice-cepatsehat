@@ -160,7 +160,14 @@
   	maximumFractionDigits: 0
 	});
 
+	function updateTable() {
+    setInterval(function() {
+      $('#invoices').DataTable().ajax.reload(null, true);
+    }, 3000);
+	}
+
 	$(document).ready(function () {
+		updateTable();
 		const invoiceTable = $('#invoices').DataTable({
 			processing: false,
 			serverSide: true,
