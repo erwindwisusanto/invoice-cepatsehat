@@ -163,6 +163,7 @@ class InvoiceController extends Controller
 		$complimentaryDiscount = $invoice->complimentary_discount;
 		$medicalTeamTransportCost = $invoice->medical_team_transport_cost;
 		$invoiceId = encryptID($invoice->id);
+		$paymentMethods = $this->invoiceService->paymentMethodName(json_decode($invoice->payment_method));
 
 		return view('pages.preview-invoice',
 			compact(
@@ -173,7 +174,8 @@ class InvoiceController extends Controller
 				'diagnosis',
 				'complimentaryDiscount',
 				'medicalTeamTransportCost',
-				'invoiceId'
+				'invoiceId',
+				'paymentMethods'
 			)
 		);
 	}
