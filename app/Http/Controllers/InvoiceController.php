@@ -206,7 +206,7 @@ class InvoiceController extends Controller
 		];
 
 		$filename = "invoice-$invoiceId.pdf";
-		return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
+		return Pdf::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
 		->setPaper('A4')
 		->loadView('pdf.invoice', $data)
 		->stream($filename);
