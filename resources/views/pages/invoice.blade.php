@@ -33,9 +33,8 @@
 				<table id="invoices" class="table nowrap" style="width:100%">
 						<thead>
 								<tr>
-									<th>Date</th>
 									<th>Name</th>
-									<th>Status</th>
+									<th class="text-center">Status</th>
 								</tr>
 						</thead>
 						<tbody>
@@ -112,11 +111,13 @@
 
 	const formatingDate = (dateTime) => {
 		let date = new Date(dateTime);
-		const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"];
+    const month = monthNames[date.getMonth()];
     const day = String(date.getDate()).padStart(2, '0');
 
-		return `${year}-${month}-${day}`;
+    return `${month} ${day}, ${year}`;
 	}
 
 	const statusInvoice = (status) => {
@@ -169,10 +170,6 @@
 			ajax: '{{ route('invoices') }}',
 			columns: [
 				{
-					data: 'created_at',
-					name: 'created_at'
-				},
-				{
 					data: 'username',
 					name: 'username'
 				},
@@ -185,22 +182,20 @@
 					targets: 0,
 					className: `align-middle`,
 					render: function(data, type, full, row) {
-						return formatingDate(data);
-					}
-				},
-				{
-					targets: 1,
-					className: `align-middle`,
-					render: function(data, type, full, row) {
 						const html = `
-							<div><span class='fs-14' style='color: #494949;'>${full['username']}</span></div>
+							<div class="col-12">
+								<div class="row mb-1">
+									<span class="fs-12 text-muted">${formatingDate(full['created_at'])}</span> <span class='fs-12 text-muted' style='color: #494949;'>${full['invoice_number']}</span>
+								</div>
+								<h5 class='fs-14' style='color: #494949; font-weight: 600;'>${full['username']}</h5>
+							</div>
 						`;
 						return html;
 					}
 				},
 				{
-					targets: 2,
-					className: `align-middle`,
+					targets: 1,
+					className: `align-middle text-center`,
 					render: function(data, type, full, row) {
 						return statusInvoice(parseInt(data));
 					}
