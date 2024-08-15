@@ -360,20 +360,20 @@
     if (cptId) {
 			let icdxData = [];
 			$('#icdx_cube .icdx-row').each(function() {
-					let selectElement = $(this).find('select');
-					let selectedOptionData = selectElement.select2('data')[0];
+				let selectElement = $(this).find('select');
+				let selectedOptionData = selectElement.select2('data')[0];
 
-					if (selectedOptionData) {
-						let icdxId = selectedOptionData.id;
-						let descIcdx = selectedOptionData.desc || '';
-						let icdxCode = selectedOptionData.code;
+				if (selectedOptionData) {
+					let icdxId = selectedOptionData.id;
+					let descIcdx = selectedOptionData.desc || '';
+					let icdxCode = selectedOptionData.code;
 
-						icdxData.push({
-							icdx_id: icdxId,
-							icdx_desc: descIcdx,
-							icdx_code: icdxCode
-						});
-					}
+					icdxData.push({
+						icdx_id: icdxId,
+						icdx_desc: descIcdx,
+						icdx_code: icdxCode
+					});
+				}
 			});
 
 			cptDatax.push({
@@ -512,6 +512,7 @@
 
 	var resetFormPopup = () => {
 		let firstRowFound = false;
+		$('#pax').val('');
 		$('#icdx_cube .icdx-row').each(function() {
 			let selectName = $(this).find('select').attr('name');
 			if (selectName === 'icdx_1') {

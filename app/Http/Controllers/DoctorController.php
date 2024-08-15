@@ -55,7 +55,6 @@ class DoctorController extends Controller
 
 		$paymentMethods = $this->invoiceService->ListPaymentMethod();
 		$infusions = $this->invoiceService->getInfusions();
-		$icdxs = $this->invoiceService->ListIcdxs();
 		$cpts = $this->invoiceService->ListCpts();
 		$services = $this->invoiceService->ListServices();
 
@@ -70,7 +69,6 @@ class DoctorController extends Controller
 				'paymentMethodSelected',
 				'diagnosis',
 				'formattedDate',
-				'icdxs',
 				'cpts',
 				'username',
 				'infusions',

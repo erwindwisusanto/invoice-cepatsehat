@@ -207,7 +207,7 @@
 					<label for="icdx" class="form-label">ICD10 Code*</label>
 					<div id="icdx_cube">
 						<div class="icdx-row d-flex align-items-center" style="margin-bottom: 10px;">
-							<select class="form-select bg-white selecttwo" aria-label="Default select example" id="icdx" name="icdx_1">
+							<select class="form-select bg-white selecttwo-icdx" aria-label="Default select example" id="icdx" name="icdx_1">
 								<option value="" data-desc="" data-code=""></option>
 							</select>
 							<button class="btn btn btn-remove remove-btn-icdx" type="button" style="margin-left: 10px;">
@@ -328,7 +328,7 @@
 	var getNewIcdxRow = (icdxCounter) => {
 		return `
 			<div class="icdx-row d-flex align-items-center" style="margin-bottom: 10px;">
-				<select class="form-select bg-white icdxselect2" aria-label="Default select example" name="icdx_${icdxCounter}">
+				<select class="form-select bg-white selecttwo-icdx" aria-label="Default select example" name="icdx_${icdxCounter}">
 				</select>
 				<button class="btn btn btn-remove remove-btn-icdx" type="button" style="margin-left: 10px;">
 					<i class="mdi mdi-close"></i>
@@ -364,17 +364,18 @@
     if (cptId) {
 			let icdxData = [];
 			$('#icdx_cube .icdx-row').each(function() {
-					let selectElement = $(this).find('select');
-					let icdxId = selectElement.val();
-					let selectedOption = selectElement.find('option:selected');
-					let descIcdx = selectedOption.data('desc');
-					let icdxCode = selectedOption.data('code');
+				let selectElement = $(this).find('select');
+				let selectedOptionData = selectElement.select2('data')[0];
 
-					if (icdxId) {
-						icdxData.push({
-							icdx_id: icdxId,
-							icdx_desc: descIcdx || '',
-							icdx_code: icdxCode
+				if (selectedOptionData) {
+					let icdxId = selectedOptionData.id;
+					let descIcdx = selectedOptionData.desc || '';
+					let icdxCode = selectedOptionData.code;
+
+					icdxData.push({
+						icdx_id: icdxId,
+						icdx_desc: descIcdx,
+						icdx_code: icdxCode
 					});
 				}
 			});
@@ -465,6 +466,7 @@
 		let data = saveFormData();
 		let dataParse = JSON.parse(data);
 		listItemsSelected(dataParse);
+		$(".selecttwo-icdx").html('');
 		resetFormPopup();
 	});
 
@@ -472,7 +474,38 @@
 		e.preventDefault();
 		const newIcdxRow = getNewIcdxRow(icdxCounter);
 		$('#icdx_cube').append(newIcdxRow);
-		$('.icdxselect2').select2();
+
+		$("#icdx_cube .selecttwo-icdx").last().select2({
+			dropdownParent: $("#offcanvasDiagnosis"),
+			width: '78%',
+			ajax: {
+				url: "{{ route('list_icdx') }}",
+				dataType: 'json',
+				delay: 250,
+				data: function (params) {
+					return {
+						search: params.term,
+						page: params.page || 1
+					};
+				},
+				processResults: function (data, params) {
+					params.page = params.page || 1;
+					return {
+						results: data.items.map(function (item) {
+							return { id: item.id, desc: item.name, code: item.code };
+						}),
+						pagination: {
+							more: (params.page * data.pageSize) < data.total
+						}
+					};
+				},
+				cache: true
+			},
+			placeholder: 'Select an ICDX',
+			templateResult: formatICDX,
+			templateSelection: formatICDXSelection
+		});
+
 		icdxCounter++;
 	});
 
@@ -489,6 +522,7 @@
 
 	var resetFormPopup = () => {
 		let firstRowFound = false;
+		$('#pax').val('');
 		$('#icdx_cube .icdx-row').each(function() {
 			let selectName = $(this).find('select').attr('name');
 			if (selectName === 'icdx_1') {
@@ -518,6 +552,34 @@
 		"cpt_icd": []
 	};
 
+	function formatICDX(icdx) {
+		if (icdx.loading) {
+			return icdx.desc;
+		}
+
+		var $container = $(
+			`<div>
+				<span data-code="${icdx?.code || ``}" data-desc="${icdx?.desc || ``}">
+					${icdx?.code || ``} - ${icdx?.desc || ``}
+				</span>
+			</div>`
+		);
+
+		return $container;
+	}
+
+	function formatICDXSelection(icdx) {
+		var $container = $(
+			`<div>
+				<span data-code="${icdx?.code || ``}" data-desc="${icdx?.desc || ``}" style="width: 90%;">
+					${icdx?.code || ``} ${icdx?.desc || ``}
+				</span>
+			</div>`
+		);
+
+		return $container;
+	}
+
 	$(document).ready(function () {
 		listItemsSelected({ cptData: cptDatax });
 
@@ -525,6 +587,37 @@
 			dropdownParent: $("#offcanvasDiagnosis"),
 			width: '100%'
 		});
+
+		$(".selecttwo-icdx").select2({
+			dropdownParent: $("#offcanvasDiagnosis"),
+			width: '78%',
+			ajax: {
+				url: "{{ route('list_icdx') }}",
+				dataType: 'json',
+				delay: 250,
+				data: function (params) {
+					return {
+						search: params.term,
+						page: params.page || 1
+					};
+				},
+				processResults: function (data, params) {
+					params.page = params.page || 1;
+					return {
+						results: data.items.map(function (item) {
+							return { id: item.id, desc: item.name, code: item.code };
+						}),
+						pagination: {
+							more: (params.page * data.pageSize) < data.total
+						}
+					};
+				},
+				cache: true
+			},
+			placeholder: 'Select an ICDX',
+			templateResult: formatICDX,
+			templateSelection: formatICDXSelection
+		})
 
 		$('#form-new-invoice').validate({
 			errorClass: 'is-invalid',
@@ -596,14 +689,4 @@
 		var selectedMethods = {{ $paymentMethodSelected ?? [] }};
 		$('#payment_method').val(selectedMethods).trigger('change');
 	});
-
-	const defaultCpt = () => {
-		$.ajax({
-			type: 'GET',
-			url: '{{ route("get_default_cpt") }}',
-			success: function(response){
-				console.log(response);
-			},
-		});
-	}
 </script>
