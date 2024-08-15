@@ -27,6 +27,9 @@ Route::middleware('auth')->group(function () {
 	Route::post('/new-invoice', [InvoiceController::class, 'createNewInvoice'])->name('post_new_invoice');
 });
 
+// ADDITIONAL
+Route::get('icdx', [InvoiceController::class, 'getIcdxs'])->name('list_icdx')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
 // GUEST FOR PATIENT & DOCTOR
 Route::get('invoice-approved', [InvoiceController::class, 'viewInvoiceApproved'])->name('view_invoice_approved');
 Route::get('/invoice/{id}', [InvoiceController::class, 'viewInvoiceGuest'])->name('view_invoice_guest');

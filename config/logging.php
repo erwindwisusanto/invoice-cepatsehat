@@ -47,6 +47,12 @@ return [
 						'level' => 'info',
 				],
 
+				'transaction' => [
+						'driver' => 'single',
+						'path' => storage_path('logs/transaction.log'),
+						'level' => 'info',
+				],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),

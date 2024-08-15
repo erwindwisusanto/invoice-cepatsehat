@@ -41,12 +41,12 @@ class InvoiceController extends Controller
 		$date = date('d F Y');
 
 		$paymentMethods = $this->invoiceService->ListPaymentMethod();
-		$icdxs = $this->invoiceService->ListIcdxs();
+		// $icdxs = $this->invoiceService->ListIcdxs();
 		$cpts = $this->invoiceService->ListCpts();
 		$infusions = $this->invoiceService->getInfusions();
 		$services = $this->invoiceService->ListServices();
 
-		return view('pages.new-invoice', compact('invoiceNumber', 'date', 'paymentMethods', 'icdxs', 'cpts', 'infusions', 'services'));
+		return view('pages.new-invoice', compact('invoiceNumber', 'date', 'paymentMethods', 'cpts', 'infusions', 'services'));
 	}
 
 	public function createNewInvoice(Request $request)
@@ -81,11 +81,27 @@ class InvoiceController extends Controller
 
 	public function getDefaultCpt()
 	{
-		$data = $this->invoiceService->DefaultCpt();
-		return response()->json([
-			'status' => 'success',
-			'data' => $data,
-    ]);
+		$data = $this->invoiceService->DefaultCpt(1);
+		if ($data && is_object($data)) {
+			// Return a JSON response with CPT data
+			return response()->json([
+					'data' => [
+							'cpt_id' => $data->id ?? null,  // Use null coalescing operator for safety
+							'cpt_code' => $data->code ?? '',  // Use default empty string if not set
+							'cpt_pax' => 1,
+							'cpt_desc' => $data->description ?? '',  // Default empty string if description not set
+							'cpt_price' => $data->price ?? 0.0,  // Default to 0.0 if price not set
+							'cpt_infusion' => $data->infusion ?? '',  // Use default empty string if infusion not set
+							'cpt_additional' => $data->additional ?? '',  // Use default empty string if additional not set
+							'cpt_icd' => $data->icd ?? []  // Ensure cpt_icd is an array, default to empty array if not set
+					]
+			]);
+		} else {
+				// Return an error response if data is not valid
+				return response()->json([
+						'error' => 'Default CPT data not found or invalid.'
+				], 404);
+		}
 	}
 
 	public function invoices()
@@ -116,7 +132,7 @@ class InvoiceController extends Controller
 
 		$paymentMethods = $this->invoiceService->ListPaymentMethod();
 		$infusions = $this->invoiceService->getInfusions();
-		$icdxs = $this->invoiceService->ListIcdxs();
+		// $icdxs = $this->invoiceService->ListIcdxs();
 		$cpts = $this->invoiceService->ListCpts();
 		$services = $this->invoiceService->ListServices();
 
@@ -131,7 +147,6 @@ class InvoiceController extends Controller
 				'paymentMethodSelected',
 				'diagnosis',
 				'formattedDate',
-				'icdxs',
 				'cpts',
 				'username',
 				'infusions',
@@ -215,5 +230,20 @@ class InvoiceController extends Controller
 	public function viewInvoiceApproved()
 	{
 		return view('pages.approved');
+	}
+
+	public function getIcdxs(Request $request)
+	{
+		$searchTerm = $request->input('search');
+		$page = $request->input('page', 1);
+		$pageSize = 50;
+
+		$result = $this->invoiceService->ListIcdxs($searchTerm, $page, $pageSize);
+
+		return response()->json([
+			'items' => $result['items'],
+			'total' => $result['total'],
+			'pageSize' => $pageSize
+		]);
 	}
 }

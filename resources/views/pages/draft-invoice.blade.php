@@ -209,9 +209,6 @@
 						<div class="icdx-row d-flex align-items-center" style="margin-bottom: 10px;">
 							<select class="form-select bg-white selecttwo" aria-label="Default select example" id="icdx" name="icdx_1">
 								<option value="" data-desc="" data-code=""></option>
-								@foreach ($icdxs as $icdx)
-									<option value="{{ $icdx->id }}" data-desc="{{ $icdx->name }}" data-code="{{ $icdx->code }}">{{ $icdx->code .' - '. $icdx->name }}</option>
-								@endforeach
 							</select>
 							<button class="btn btn btn-remove remove-btn-icdx" type="button" style="margin-left: 10px;">
 								<i class="mdi mdi-close"></i>
@@ -332,9 +329,6 @@
 		return `
 			<div class="icdx-row d-flex align-items-center" style="margin-bottom: 10px;">
 				<select class="form-select bg-white icdxselect2" aria-label="Default select example" name="icdx_${icdxCounter}">
-					@foreach ($icdxs as $icdx)
-						<option value="{{ $icdx->id }}" data-desc="{{ $icdx->name }}" data-code="{{ $icdx->code }}">{{ $icdx->code .' - '. $icdx->name }}</option>
-					@endforeach
 				</select>
 				<button class="btn btn btn-remove remove-btn-icdx" type="button" style="margin-left: 10px;">
 					<i class="mdi mdi-close"></i>

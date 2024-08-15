@@ -2,7 +2,9 @@
 namespace App\Http\Services;
 
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class InvoiceService
 {
@@ -19,10 +21,30 @@ class InvoiceService
 		return $paymentMethods;
 	}
 
-	public function ListIcdxs()
+	public function ListIcdxs($searchTerm, $page, $pageSize)
 	{
-		$icdx = DB::table('icdx')->where('is_active', 1)->get();
-		return $icdx;
+		try {
+			$query = DB::table('icdx')
+            ->where('is_active', 1);
+
+        if ($searchTerm) {
+          $query->where('name', 'like', "%{$searchTerm}%");
+        }
+
+        $total = $query->count();
+
+        $items = $query
+					->offset(($page - 1) * $pageSize)
+					->limit($pageSize)
+					->get(['id', 'code', 'name']);
+
+        return [
+					'items' => $items,
+					'total' => $total,
+        ];
+		} catch (QueryException $e) {
+			return false;
+		}
 	}
 
 	public function ListCpts()
@@ -101,6 +123,13 @@ class InvoiceService
 
 			DB::commit();
 
+			$dataLogs = [
+				'form_1' => $form,
+				'form_2' => $form2,
+			];
+
+			Log::channel('transaction')->info('[INVOICE_NEW] [SUBMIT INVOICE SUCCESS] ['.auth()->user()->username.'] REQUEST ' . json_encode($dataLogs));
+
 			if ($status == 2) {
 				$doctorName = "Erwin";
 				$doctorPhoneNumber = "6282110796637";
@@ -115,6 +144,7 @@ class InvoiceService
 			];
 		} catch (\Exception $e) {
 			DB::rollBack();
+			Log::channel('transaction')->info('[INVOICE_NEW] [SUBMIT INVOICE FAILED] ['.auth()->user()->username.'] REQUEST ' . json_encode($dataLogs) . ' | ' . $e->getMessage());
 			return [
 				'success' => false,
 				'message' => $e->getMessage(),
@@ -129,6 +159,11 @@ class InvoiceService
 
 	public function updateInvoice($form, $form2, $buttonType)
 	{
+		$dataLogs = [
+			'form_1' => $form,
+			'form_2' => $form2,
+		];
+
 		$username = $form['username'] ?? null;
     $address 	= $form['address'] ?? null;
     $phoneNumber = $form['phone_number'] ?? null;
@@ -186,6 +221,8 @@ class InvoiceService
 
 			DB::commit();
 
+			Log::channel('transaction')->info('[INVOICE_DRAFT] [UPDATE INVOICE SUCCESS] ['.auth()->user()->username.'] REQUEST ' . json_encode($dataLogs));
+
 			if ($status == 2) {
 				$doctorName = "Erwin";
 				$doctorPhoneNumber = "6282110796637";
@@ -200,6 +237,7 @@ class InvoiceService
 			];
 		} catch (\Exception $e) {
 			DB::rollBack();
+			Log::channel('transaction')->info('[INVOICE_DRAFT] [UPDATE INVOICE FAILED] ['.auth()->user()->username.'] REQUEST ' . json_encode($dataLogs) . ' | ' . $e->getMessage());
 			return [
 				'success' => false,
 				'message' => $e->getMessage(),
@@ -265,10 +303,10 @@ class InvoiceService
 		}
 	}
 
-	public function DefaultCpt()
+	public function DefaultCpt($cptId)
 	{
 		try {
-			$cpt = DB::table('cpt')->where('id', 2)->first();
+			$cpt = DB::table('cpt')->where('id', $cptId)->first();
 			return $cpt;
 		} catch (\Exception $e) {
 			return $e->getMessage();
