@@ -367,10 +367,10 @@
 				let selectElement = $(this).find('select');
 				let selectedOptionData = selectElement.select2('data')[0];
 
-				if (selectedOptionData) {
-					let icdxId = selectedOptionData.id;
-					let descIcdx = selectedOptionData.desc || '';
-					let icdxCode = selectedOptionData.code;
+				if (selectedOptionData && selectedOptionData.id) {
+					let icdxId = selectedOptionData?.id || '';
+					let descIcdx = selectedOptionData?.desc || '';
+					let icdxCode = selectedOptionData?.code || '';
 
 					icdxData.push({
 						icdx_id: icdxId,
@@ -388,7 +388,7 @@
 				cpt_price: infusionValue,
 				cpt_infusion: infusionName,
 				cpt_additional: customAdditional,
-				cpt_icd: icdxData
+				cpt_icd: icdxData.length > 0 ? icdxData : []
 			});
     }
 
@@ -517,12 +517,10 @@
 		} else {
 			$(this).prop('disabled', true);
 		}
-		saveFormData();
 	});
 
 	var resetFormPopup = () => {
 		let firstRowFound = false;
-		$('#pax').val('');
 		$('#icdx_cube .icdx-row').each(function() {
 			let selectName = $(this).find('select').attr('name');
 			if (selectName === 'icdx_1') {
