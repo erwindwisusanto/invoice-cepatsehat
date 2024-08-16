@@ -319,9 +319,9 @@ class InvoiceService
 		try {
 			$updateStatus = $this->updateStatusInvoiceToDone($invoiceId);
 
-			if ($updateStatus) {
-				$this->sendWhatsappToPatient($invoiceId);
-			}
+			// if ($updateStatus) {
+			// 	$this->sendWhatsappToPatient($invoiceId);
+			// }
 
 			return true;
 		} catch (\Exception $e) {
@@ -367,12 +367,13 @@ class InvoiceService
 
 	private function updateStatusInvoiceToDone($invoiceId)
 	{
+		DB::beginTransaction();
 		try {
-			DB::beginTransaction();
 			DB::table('invoice')->where('id', decryptID($invoiceId))->update(['status' => 3]);
-			$this->dataTransaction($invoiceId);
+
 			DB::commit();
 
+			$this->dataTransaction($invoiceId);
 			Log::channel('doctor')->info('[UPDATE INVOICE DOCTOR] [SUCCESS] INVOICE_ID ' . decryptID($invoiceId));
 			return true;
 		} catch (\Exception $e) {
