@@ -319,9 +319,9 @@ class InvoiceService
 		try {
 			$updateStatus = $this->updateStatusInvoiceToDone($invoiceId);
 
-			// if ($updateStatus) {
-			// 	$this->sendWhatsappToPatient($invoiceId);
-			// }
+			if ($updateStatus) {
+				$this->sendWhatsappToPatient($invoiceId);
+			}
 
 			return true;
 		} catch (\Exception $e) {
