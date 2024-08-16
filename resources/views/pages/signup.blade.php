@@ -20,13 +20,13 @@
 						/>
 				</div>
 				<div class="mb-4">
-					<label for="" class="form-label">Phone Number</label>
+					<label for="" class="form-label">Phone Number <small style="color: red;">*FORMAT NUMBER 62821107XXX</small></label>
 					<input
 						type="number"
 						class="form-control"
 						id="phone"
 						name="phone"
-						placeholder="082111XXX"
+						placeholder="6282111XXX"
 						required
 						/>
 				</div>
