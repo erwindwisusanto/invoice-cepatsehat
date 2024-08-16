@@ -177,8 +177,8 @@
 			ajax: '{{ route('invoices') }}',
 			columns: [
 				{
-					data: 'username',
-					name: 'username'
+					data: 'updated_at',
+					name: 'updated_at'
 				},
 				{
 					data: 'status',

@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class InvoiceService
 {
@@ -128,7 +129,7 @@ class InvoiceService
 				'form_2' => $form2,
 			];
 
-			Log::channel('transaction')->info('[INVOICE_NEW] [SUBMIT INVOICE SUCCESS] ['.auth()->user()->username.'] REQUEST ' . json_encode($dataLogs));
+			Log::channel('user')->info('[INVOICE_NEW] [SUBMIT INVOICE SUCCESS] ['.auth()->user()->id.'] REQUEST ' . json_encode($dataLogs));
 
 			if ($status == 2) {
 				$doctorName = "Erwin";
@@ -144,7 +145,7 @@ class InvoiceService
 			];
 		} catch (\Exception $e) {
 			DB::rollBack();
-			Log::channel('transaction')->info('[INVOICE_NEW] [SUBMIT INVOICE FAILED] ['.auth()->user()->username.'] REQUEST ' . json_encode($dataLogs) . ' | ' . $e->getMessage());
+			Log::channel('user')->info('[INVOICE_NEW] [SUBMIT INVOICE FAILED] ['.auth()->user()->id.'] REQUEST ' . json_encode($dataLogs) . ' | ' . $e->getMessage());
 			return [
 				'success' => false,
 				'message' => $e->getMessage(),
@@ -221,7 +222,7 @@ class InvoiceService
 
 			DB::commit();
 
-			Log::channel('transaction')->info('[INVOICE_DRAFT] [UPDATE INVOICE SUCCESS] ['.auth()->user()->username.'] REQUEST ' . json_encode($dataLogs));
+			Log::channel('user')->info('[INVOICE_DRAFT] [UPDATE INVOICE SUCCESS] ['.auth()->user()->id.'] REQUEST ' . json_encode($dataLogs));
 
 			if ($status == 2) {
 				$doctorName = "Erwin";
@@ -237,7 +238,7 @@ class InvoiceService
 			];
 		} catch (\Exception $e) {
 			DB::rollBack();
-			Log::channel('transaction')->info('[INVOICE_DRAFT] [UPDATE INVOICE FAILED] ['.auth()->user()->username.'] REQUEST ' . json_encode($dataLogs) . ' | ' . $e->getMessage());
+			Log::channel('user')->info('[INVOICE_DRAFT] [UPDATE INVOICE FAILED] ['.auth()->user()->id.'] REQUEST ' . json_encode($dataLogs) . ' | ' . $e->getMessage());
 			return [
 				'success' => false,
 				'message' => $e->getMessage(),
@@ -369,11 +370,41 @@ class InvoiceService
 		try {
 			DB::beginTransaction();
 			DB::table('invoice')->where('id', decryptID($invoiceId))->update(['status' => 3]);
+			$this->dataTransaction($invoiceId);
 			DB::commit();
 
+			Log::channel('doctor')->info('[UPDATE INVOICE DOCTOR] [SUCCESS] INVOICE_ID ' . decryptID($invoiceId));
 			return true;
 		} catch (\Exception $e) {
 			DB::rollBack();
+			Log::channel('doctor')->info('[UPDATE INVOICE DOCTOR] [FAILED] INVOICE_ID ' . decryptID($invoiceId));
+			return false;
+		}
+	}
+
+	public function dataTransaction($invoiceId)
+	{
+		$invoice = $this->getInvoiceById(decryptID($invoiceId));
+		DB::beginTransaction();
+		try {
+			$diagnosis = json_decode($invoice->diagnosis, true);
+			$total_price = 0;
+			foreach ($diagnosis as $item) {
+				$total_price += $item["cpt_price"] * $item["cpt_pax"];
+			}
+
+			$transactionData = [
+				'invoice_id' => $invoice->id,
+				'service' => $invoice->service,
+				'total_price' => ($total_price - $invoice->complimentary_discount) + $invoice->medical_team_transport_cost,
+				'date' => now()->format('Y-m-d'),
+			];
+
+			DB::table('transaction')->insert($transactionData);
+			DB::commit();
+
+			return true;
+		} catch (\Throwable $e) {
 			return false;
 		}
 	}

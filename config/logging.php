@@ -47,9 +47,15 @@ return [
 						'level' => 'info',
 				],
 
-				'transaction' => [
+				'user' => [
 						'driver' => 'single',
-						'path' => storage_path('logs/transaction.log'),
+						'path' => storage_path('logs/user.log'),
+						'level' => 'info',
+				],
+
+				'doctor' => [
+						'driver' => 'single',
+						'path' => storage_path('logs/doctor.log'),
 						'level' => 'info',
 				],
 
