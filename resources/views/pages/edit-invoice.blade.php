@@ -20,7 +20,7 @@
 				<input type="hidden" name="invoice_number" id="invoice_number" value="{{ $invoiceNumber }}">
 				<input type="hidden" name="invoice_id" id="invoice_id" value="{{ $invoiceId }}">
 				<div class="mb-4">
-					<label for="" class="form-label">Username*</label>
+					<label for="" class="form-label">Name</label>
 					<input
 						type="text"
 						class="form-control bg-white"
@@ -32,7 +32,7 @@
 						/>
 				</div>
 				<div class="mb-4">
-					<label for="" class="form-label">Address*</label>
+					<label for="" class="form-label">Address</label>
 					<textarea
 						name="address"
 						class="form-control bg-white"
@@ -41,7 +41,7 @@
 						id="address">{{ $address ?? '' }}</textarea>
 				</div>
 				<div class="mb-4">
-					<label for="" class="form-label">Phone*</label>
+					<label for="" class="form-label">Phone</label>
 					<input
 						type="number"
 						class="form-control bg-white"

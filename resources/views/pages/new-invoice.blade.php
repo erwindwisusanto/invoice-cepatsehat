@@ -19,7 +19,7 @@
 				@csrf
 				<input type="hidden" name="invoice_number" id="invoice_number" value="{{ $invoiceNumber }}">
 				<div class="mb-4">
-					<label for="" class="form-label">Username*</label>
+					<label for="" class="form-label">Name</label>
 					<input
 						type="text"
 						class="form-control bg-white"
@@ -29,7 +29,7 @@
 						placeholder="Complete name" />
 				</div>
 				<div class="mb-4">
-					<label for="" class="form-label">Address*</label>
+					<label for="" class="form-label">Address</label>
 					<textarea
 						name="address"
 						class="form-control bg-white"
@@ -38,7 +38,7 @@
 						id="address"></textarea>
 				</div>
 				<div class="mb-4">
-					<label for="" class="form-label">Phone* <small style="color: red;">FORMAT NUMBER 62821107XXX</small></label>
+					<label for="" class="form-label">Phone <small style="color: red;">FORMAT NUMBER 62821107XXX</small></label>
 					<input
 						type="number"
 						class="form-control bg-white"

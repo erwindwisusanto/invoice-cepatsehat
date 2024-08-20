@@ -8,14 +8,29 @@
 					alt="" />
 			</div>
 
-			<div class="input-group form-search">
+			<div class="row">
+				<div class="col-6">
+					<select class="form-select" id="filter-status" name="filter-status" data-placeholder="Choose Status" style="background: none;">
+						<option value="" selected>All</option>
+						<option value="1">Draft</option>
+						<option value="2">On Progress</option>
+						<option value="3">Done</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="input-group form-search mt-4">
 				<input
 					type="text"
 					class="form-control"
 					placeholder="Search ..."
 					aria-label="Search ..."
-					aria-describedby="basic-addon2" />
-				<span class="input-group-text" id="basic-addon2">
+					aria-describedby="basic-addon2"
+					style="background: none;"
+					/>
+				<span class="input-group-text" id="basic-addon2"
+					style="background: none;"
+				>
 					<i class="fi fi-rr-search"></i>
 				</span>
 			</div>
@@ -35,6 +50,7 @@
 								<tr>
 									<th>Name</th>
 									<th class="text-center">Status</th>
+									<th class="text-center d-none">Name</th>
 								</tr>
 						</thead>
 						<tbody>
@@ -123,7 +139,7 @@
 	const statusInvoice = (status) => {
 		var classNamebadge;
 		var name;
-		switch (status) {
+		switch (parseInt(status)) {
 			case 1:
 				name = 'Draft';
 				classNamebadge = 'badge badge-draft';
@@ -145,7 +161,20 @@
 				classNamebadge = 'badge badge-info';
 				break;
 		}
-		return `<span class="${classNamebadge} fs-14" style="font-weight: normal;">${name}</span>`;
+		return `<span class="${classNamebadge} fs-14" style="font-weight: normal; border-radius: 999px">${name}</span>`;
+	}
+
+	const mapSearchTerm = (term) => {
+		switch (term) {
+			case 'draft':
+				return '^1$';
+			case 'on progress':
+				return '^(2|4)$';
+			case 'done':
+				return '^3$';
+			default:
+				return null;
+		}
 	}
 
 	const directToNewInvoice = (invoiceId) => {
@@ -183,6 +212,10 @@
 				{
 					data: 'status',
 					name: 'status'
+				},
+				{
+					data: 'username',
+					name: 'username'
 				}
 			],columnDefs: [
 				{
@@ -206,6 +239,13 @@
 					render: function(data, type, full, row) {
 						return statusInvoice(parseInt(data));
 					}
+				},
+				{
+					targets: 2,
+					className: `align-middle text-center d-none`,
+					render: function(data, type, full, row) {
+						return statusInvoice(parseInt(data));
+					}
 				}
 			],
 			language: {
@@ -217,6 +257,15 @@
 			initComplete: function () {
 				$('.form-search input').on('keyup', function () {
 					invoiceTable.search(this.value).draw();
+				});
+
+				$('#filter-status').on('change', function () {
+					const selectedValue = this.value;
+					if (selectedValue === '') {
+            invoiceTable.column(1).search('').draw();
+					} else {
+						invoiceTable.column(1).search(`^${selectedValue}$`, true, false).draw();
+					}
 				});
 			}
 		});
