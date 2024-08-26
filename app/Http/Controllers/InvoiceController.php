@@ -177,6 +177,7 @@ class InvoiceController extends Controller
 		$diagnosis = json_decode($invoice->diagnosis) ?? [];
 		$complimentaryDiscount = $invoice->complimentary_discount;
 		$medicalTeamTransportCost = $invoice->medical_team_transport_cost;
+		$costNightService = $invoice->cost_night_service;
 		$invoiceId = encryptID($invoice->id);
 		$paymentMethods = $this->invoiceService->paymentMethodName(json_decode($invoice->payment_method));
 
@@ -190,7 +191,8 @@ class InvoiceController extends Controller
 				'complimentaryDiscount',
 				'medicalTeamTransportCost',
 				'invoiceId',
-				'paymentMethods'
+				'paymentMethods',
+				'costNightService'
 			)
 		);
 	}

@@ -75,34 +75,26 @@
 							</tr>
 						@endforeach
 						<tr>
-							<td></td>
-							<td class="text-end"><span class="fw-semibold">Complimentary disc</span></td>
-							<td></td>
-							<td></td>
-							<td><span>Rp {{ number_format($complimentaryDiscount) }}</span></td>
+							<td colspan="4" class="text-end"><span class="fw-semibold">Complimentary disc</span></td>
+							<td><span>Rp {{ number_format($complimentaryDiscount, 0, ',' , '.') }}</span></td>
 						</tr>
 						<tr>
-							<td></td>
-							<td class="text-end"><span class="fw-semibold">Med. team transport cost</span></td>
-							<td></td>
-							<td></td>
-							<td><span>Rp {{ number_format($medicalTeamTransportCost) }}</span></td>
+							<td colspan="4" class="text-end"><span class="fw-semibold">Med. team transport cost</span></td>
+							<td><span>Rp {{ number_format($medicalTeamTransportCost, 0, ',' , '.') }}</span></td>
 						</tr>
 						<tr>
-							<td></td>
-							<td class="text-end"><span class="fw-semibold">Total</span></td>
-							<td></td>
-							<td></td>
-							<td><span class="fw-semibold">Rp {{ number_format(($totalPrice - $complimentaryDiscount) + $medicalTeamTransportCost) }}</span></td>
+							<td colspan="4" class="text-end"><span class="fw-semibold">Night service cost</span></td>
+							<td><span>Rp {{ number_format(!empty($costNightService) ? $costNightService : 0, 0, ',' , '.') }}</span></td>
 						</tr>
 						<tr>
-							<td></td>
-							<td class="text-end"><span class="fw-semibold">Payment Method</span></td>
-							<td></td>
-							<td></td>
+							<td colspan="4" class="text-end"><span class="fw-semibold">Total</span></td>
+							<td><span class="fw-semibold">Rp {{ number_format(($totalPrice - $complimentaryDiscount) + $medicalTeamTransportCost + $costNightService, 0, ',' , '.') }}</span></td>
+						</tr>
+						<tr>
+							<td colspan="4" class="text-end"><span class="fw-semibold">Payment Method</span></td>
 							<td><span class="fw-semibold">
 								@foreach ($paymentMethods as $index => $payment)
-										<b>{{ $payment }}@if (!$loop->last), @endif</b>
+									{{ $payment }}@if (!$loop->last), @endif
 								@endforeach
 						</span></td>
 						</tr>
@@ -110,12 +102,12 @@
 				</table>
 				<div class="row gx-0">
 					@php
-						$price = ($totalPrice - $complimentaryDiscount) + $medicalTeamTransportCost;
+						$price = ($totalPrice - $complimentaryDiscount) + $medicalTeamTransportCost + $costNightService;
 					@endphp
 					<span>Said: <span class="fw-semibold fst-italic">{{ numberToWords($price)}} Rupiahs</span></span>
 				</div>
 				<div class="row mt-5 gx-0">
-					<div class="col-5">
+					<div class="col-5 position-relative">
 						<div class="row">
 							<span class="fw-semibold">Clinic Cepat Sehat</span>
 						</div>
@@ -123,6 +115,7 @@
 							<span class="fw-semibold">dr. Irvan Rizki Fikri</span>
 							<span class="fw-semibold">General Practitioner</span>
 						</div>
+						<img src="{{ asset('assets/img/Stempel-Dokter-Irvan-pake-ttd-Rev.png') }}" alt="Stamp" class="stamp-img">
 					</div>
 					<div class="col-6 offset-1">
 						<div class="row">

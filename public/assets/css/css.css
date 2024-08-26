@@ -177,3 +177,17 @@
 .dataTables_wrapper table thead{
 	display:none;
 }
+
+
+.position-relative {
+	position: relative;
+}
+
+.stamp-img {
+	position: absolute;
+	bottom: 33px;
+	right: 55px;
+	width: 145px;
+	opacity: 0.5;
+	transform: rotate(0deg);
+}
