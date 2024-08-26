@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice</title>
-		<link rel="icon" type="image/x-icon" href="assets/img/favicon.svg"/>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.svg" />
     <style>
-				:root {
-					font-size: 14px;
-					font-family: Arial, Helvetica, sans-serif;
-				}
+        :root {
+            font-size: 14px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
 
         body {
-					margin: 0px;
-					padding: 0px;
+            margin: 0px;
+            padding: 0px;
         }
 
         .container {
@@ -36,7 +36,7 @@
         }
 
         .fw-semibold {
-					font-family: Arial, Helvetica, sans-serif !important;
+            font-family: Arial, Helvetica, sans-serif !important;
         }
 
         .img-fluid {
@@ -109,22 +109,34 @@
             margin: 0;
             padding-left: 20px;
         }
+
+        .position-relative {
+            position: relative;
+        }
+
+        .stamp-img {
+            position: absolute;
+            bottom: 200vh;
+            right: 80px;
+            width: 200px;
+            opacity: 0.5;
+            transform: rotate(0deg);
+        }
     </style>
 </head>
 
 <body>
-    <div class="py-3">
+	<div style="position: relative; min-height: 100vh;">
+			<div style="position: absolute; top: 0; left: 0; width: 100%; text-align: center;">
+					@php
+							$imagePath = public_path('assets/img/atas_pdf.png');
+							$imageData = base64_encode(file_get_contents($imagePath));
+					@endphp
+					<img src="data:image/png;base64,{{ $imageData }}" style="max-width: 100%;">
+			</div>
+	</div>
+    <div class="py-3" style="padding-top: 170px">
         <div class="container">
-            <div class="text-left">
-							@php
-									$imagePath = public_path('assets/img/logo-cepatsehat.png');
-									$imageData = base64_encode(file_get_contents($imagePath));
-							@endphp
-							<img
-							src="data:image/png;base64,{{$imageData}}"
-							class="logo-cepatsehat"
-							alt="cepatsehat" width="20%"/>
-            </div>
             <div class="mt-3">
                 <div class="text-left">
                     <h3 class="fw-semibold" style="color: #007A7D;">INVOICE</h3>
@@ -138,7 +150,7 @@
                 <div>
                     <span class="d-block fs-14 ">Invoice to:</span>
                     <span class="d-block fs-14 fw-semibold" style="color: #66666;">{{ $username }}</span>
-                    <span class="d-block fs-14 ">{{ $address }}</span>
+                    <span class="d-block fs-14 ">{{ $phoneNumber . ', '. $address }}</span>
                 </div>
             </div>
             <div class="mt-5">
@@ -195,40 +207,35 @@
                             </tr>
                         @endforeach
                         <tr>
-                            <td></td>
-                            <td class="text-right"><span class="fw-semibold"><b>Complimentary disc</b></span></td>
-                            <td></td>
-                            <td></td>
-                            <td><span>Rp {{ number_format($complimentaryDiscount) }}</span></td>
+                            <td colspan="4" class="text-right"><span class="fw-semibold"><b>Complimentary disc</b></span></td>
+                            <td><span>Rp {{ number_format($complimentaryDiscount, 0, ',', '.') }}</span></td>
                         </tr>
                         <tr>
-                            <td></td>
-                            <td class="text-right"><span class="fw-semibold"><b>Med. team transport cost</b></span></td>
-                            <td></td>
-                            <td></td>
-                            <td><span>Rp {{ number_format($medicalTeamTransportCost) }}</span></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-right"><span class="fw-semibold"><b>Total</b></span></td>
-                            <td></td>
-                            <td></td>
-                            <td><span class="fw-semibold"><b>Rp
-                                    {{ number_format($totalPrice - $complimentaryDiscount + $medicalTeamTransportCost) }}</b></span>
-                            </td>
+                            <td colspan="4" class="text-right"><span class="fw-semibold"><b>Med. team transport cost</b></span></td>
+                            <td><span>Rp {{ number_format($medicalTeamTransportCost, 0, ',', '.') }}</span></td>
                         </tr>
 												<tr>
-													<td></td>
-													<td class="text-right"><span class="fw-semibold"><b>Payment Method</b></span></td>
-													<td></td>
-													<td></td>
-													<td><span class="fw-semibold">
-														@foreach ($paymentMethod as $index => $payment)
-																<b>{{ $payment }}@if (!$loop->last), @endif</b>
-														@endforeach
-												</span>
-												</td>
+													<td colspan="4" class="text-right"><span class="fw-semibold"><b>Night service cost</b></span></td>
+													<td><span>Rp {{ number_format($nightServiceCost, 0, ',', '.') }}</span></td>
 											</tr>
+                        <tr>
+                            <td colspan="4" class="text-right"><span class="fw-semibold"><b>Total</b></span></td>
+                            <td><span class="fw-semibold"><b>Rp
+                                        {{ number_format($totalPrice - $complimentaryDiscount + $medicalTeamTransportCost, 0, ',', '.') }}</b></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-right"><span class="fw-semibold"><b>Payment Method</b></span></td>
+                            <td><span class="fw-semibold">
+                                    @foreach ($paymentMethod as $index => $payment)
+                                        <b>{{ $payment }}@if (!$loop->last)
+                                                ,
+                                            @endif
+                                        </b>
+                                    @endforeach
+                                </span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 <div class="mt-4">
@@ -238,16 +245,21 @@
                     <span>Said: <span class="fw-semibold fst-italic">{{ numberToWords($price) }} Rupiahs</span></span>
                 </div>
                 <div class="mt-5" style="margin-top: 7rem;">
-                    <div style="width: 35%; float: left;">
+                    <div class="position-relative" style="width: 35%; float: left;">
                         <div>
                             <span class="fw-semibold">Clinic Cepat Sehat</span>
+														@php
+															$imagePath = public_path('assets/img/Stempel-Dokter-Irvan-pake-ttd-Rev.png');
+															$imageData = base64_encode(file_get_contents($imagePath));
+													@endphp
+													<img src="data:image/png;base64,{{ $imageData }}" alt="Stamp" class="stamp-img" style="z-index: 100000;">
                         </div>
                         <div class="mt-5" style="margin-top: 4.5rem;">
                             <span class="fw-semibold"><b>dr. Irvan Rizki Fikri</b></span><br>
                             <span class="fw-semibold">General Practitioner</span>
                         </div>
                     </div>
-										<div style="width: 10%"></div>
+                    <div style="width: 10%"></div>
                     <div style="width: 35%; float: right;">
                         <div>
                             <span>For payment please wired to :</span>
@@ -264,6 +276,15 @@
             </div>
         </div>
     </div>
+		<div style="position: relative; min-height: 100vh;">
+			<div style="position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center;">
+					@php
+							$imagePath = public_path('assets/img/bawah_pdf.png');
+							$imageData = base64_encode(file_get_contents($imagePath));
+					@endphp
+					<img src="data:image/png;base64,{{ $imageData }}" style="max-width: 100%;">
+			</div>
+	</div>
 </body>
 
 </html>
