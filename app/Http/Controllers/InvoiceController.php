@@ -128,10 +128,10 @@ class InvoiceController extends Controller
 		$username = $invoice->username;
 		$invoiceId = encryptID($invoice->id);
 		$service_selected = (int) $invoice->service;
+		$costNightService = $invoice->cost_night_service;
 
 		$paymentMethods = $this->invoiceService->ListPaymentMethod();
 		$infusions = $this->invoiceService->getInfusions();
-		// $icdxs = $this->invoiceService->ListIcdxs();
 		$cpts = $this->invoiceService->ListCpts();
 		$services = $this->invoiceService->ListServices();
 
@@ -151,7 +151,8 @@ class InvoiceController extends Controller
 				'infusions',
 				'invoiceId',
 				'services',
-				'service_selected'
+				'service_selected',
+				'costNightService'
 				)
 		);
 	}
