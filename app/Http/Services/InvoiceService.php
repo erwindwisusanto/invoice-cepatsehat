@@ -5,7 +5,6 @@ use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Throwable;
 
 class InvoiceService
 {
@@ -67,6 +66,7 @@ class InvoiceService
     $phoneNumber = $form['phone_number'] ?? null;
     $complimentaryDiscount = !empty($form['complimentary_discount']) ? str_replace('.','', $form['complimentary_discount']) : 0;
     $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? str_replace('.','', $form['medical_team_transport_cost']) : 0;
+    $costNightService = !empty($form['cost_night_service']) ? str_replace('.','', $form['cost_night_service']) : 0;
     $invoiceNumber = $form['invoice_number'] ?? null;
 		$service = (int) $form['service'] ?? 0;
 
@@ -113,6 +113,7 @@ class InvoiceService
 										'invoice_number' => $invoiceNumber,
 										'complimentary_discount' => (int) $complimentaryDiscount,
 										'medical_team_transport_cost' => (int) $medicalTeamTransportCost,
+										'cost_night_service' => (int) $costNightService,
 										'payment_method' => $payment_methods_json,
 										'diagnosis' => $cpt_data_json,
 										'unique_invoice_number' => $uniqueNumbers,

@@ -31,7 +31,7 @@
 				<span class="input-group-text" id="basic-addon2"
 					style="background: none;"
 				>
-					<i class="fi fi-rr-search"></i>
+				<i class="fi fi-rr-search"></i>
 				</span>
 			</div>
 

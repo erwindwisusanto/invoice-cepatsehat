@@ -41,7 +41,6 @@ class InvoiceController extends Controller
 		$date = date('d F Y');
 
 		$paymentMethods = $this->invoiceService->ListPaymentMethod();
-		// $icdxs = $this->invoiceService->ListIcdxs();
 		$cpts = $this->invoiceService->ListCpts();
 		$infusions = $this->invoiceService->getInfusions();
 		$services = $this->invoiceService->ListServices();
