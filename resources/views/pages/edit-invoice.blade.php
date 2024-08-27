@@ -1,5 +1,5 @@
 <x-master-layout>
-	<x-breadcrumbs route="{{ route('view_invoice') }}" title="Edit Invoice" />
+	<x-breadcrumbs route="{{ route('view_invoice_guest', ['id' => $invoiceId, 'view' => 'oYR7Y ']) }}" title="View Invoice" />
 	<div class="content-body pb-5">
 		<div class="container">
 			<div class="mb-2">
@@ -20,7 +20,7 @@
 				<input type="hidden" name="invoice_number" id="invoice_number" value="{{ $invoiceNumber }}">
 				<input type="hidden" name="invoice_id" id="invoice_id" value="{{ $invoiceId }}">
 				<div class="mb-4">
-					<label for="" class="form-label">Name</label>
+					<label for="" class="form-label">Name<small style="color: red;">*</small></label>
 					<input
 						type="text"
 						class="form-control bg-white"
@@ -32,7 +32,7 @@
 						/>
 				</div>
 				<div class="mb-4">
-					<label for="" class="form-label">Address</label>
+					<label for="" class="form-label">Address<small style="color: red;">*</small></label>
 					<textarea
 						name="address"
 						class="form-control bg-white"
@@ -41,15 +41,16 @@
 						id="address">{{ $address ?? '' }}</textarea>
 				</div>
 				<div class="mb-4">
-					<label for="" class="form-label">Phone</label>
+					<label for="" class="form-label">Phone<small style="color: red;">* 62821107XXX</small></label>
 					<input
 						type="number"
 						class="form-control bg-white"
 						id="phone_number"
 						name="phone_number"
 						aria-describedby=""
-						placeholder="Enter phone number"
+						placeholder="Enter phone number 62821107XXX"
 						value="{{ $phone ?? '-' }}"
+						pattern="62[0-9]{9,14}"
 						/>
 				</div>
 				<hr />
@@ -66,7 +67,7 @@
 					</a>
 				</div>
 				<div class="list-diagnosis">
-					<div class="items-diagnosis">
+					<div class="items-diagnosis" style="padding: 8px 0px 0px 0px;">
 					</div>
 				</div>
 				<hr />
@@ -95,6 +96,21 @@
 						aria-describedby=""
 						placeholder="eg. 500.000"
 						value="{{ formatCurrency($medicalTeamTransportCost) ?? 0 }}"
+						oninput="formatCurrency(this)"
+						/>
+				</div>
+				<div class="mb-4">
+					<label for="cost_night_service" class="form-label">
+						Night Service
+					</label>
+					<input
+						type="text"
+						class="form-control bg-white"
+						id="cost_night_service"
+						name="cost_night_service"
+						aria-describedby=""
+						placeholder="eg. 20.000"
+						value="{{ formatCurrency($costNightService) ?? 0 }}"
 						oninput="formatCurrency(this)"
 						/>
 				</div>
@@ -147,12 +163,12 @@
 				aria-label="Close"></button>
 		</div>
 		<div class="offcanvas-body pb-3" style="overflow-y: auto;">
-			<form id="formpopup">
+			<form id="formpopup" style="overflow-y: visible; height: 80vh;">
 				<div class="mb-4">
-					<label for="cpt" class="form-label">CPT Code*</label>
+					<label for="cpt" class="form-label">CPT Code<small style="color: red;">*</small></label>
 					<div id="cpt_cube">
 						<div class="cpt-row d-flex align-items-center" style="margin-bottom: 10px;">
-							<select class="form-select bg-white selecttwo" aria-label="Default select example" id="cpt" name="cpt_1">
+							<select class="form-select bg-white selecttwo" aria-label="Default select example" id="cpt" name="cpt_1" required>
 								@foreach ($cpts as $cpt)
 									<option value="{{ $cpt->id }}" data-desc="{{ $cpt->description }}" data-code="{{ $cpt->code }}">{{ $cpt->code .' - '. $cpt->description }}</option>
 								@endforeach
@@ -161,10 +177,11 @@
 					</div>
 				</div>
 				<div class="mb-4 d-none" id="cube_infusion">
-					<label for="infusion" class="form-label">Infusions*</label>
+					<label for="infusion" class="form-label">Infusions<small style="color: red;">*</small></label>
 					<div id="infusion_cube">
 						<div class="d-flex align-items-center" style="margin-bottom: 10px;">
 							<select class="form-select bg-white selecttwo" aria-label="Default select example" id="infusion" name="infusion">
+								<option value="" selected disabled>Choose Infusion</option>
 								@foreach ($infusions as $infusion)
 									<option value="{{ $infusion->price }}" data-desc="{{ $infusion->infusion }}">{{ $infusion->infusion }}</option>
 								@endforeach
@@ -172,18 +189,28 @@
 						</div>
 					</div>
 				</div>
+				<div class="mb-4 mt-3 d-none infusion_custom_price">
+					<label for="infusion_custom_price" class="form-label">Infusion Price</label>
+					<input
+						type="text"
+						class="form-control bg-white"
+						id="infusion_custom_price"
+						name="infusion_custom_price"
+						oninput="formatCurrency(this)"/>
+				</div>
 				<div class="mb-4 mt-3">
-					<label for="pax" class="form-label">Pax*</label>
+					<label for="pax" class="form-label">Pax<small style="color: red;">*</small></label>
 					<input
 						type="number"
 						class="form-control bg-white"
 						id="pax"
 						name="pax"
 						aria-describedby=""
-						placeholder="eg. 1" required/>
+						placeholder="eg. 1"
+						required/>
 				</div>
 				<div class="mb-4 mt-3 d-none custom_additional_cube">
-					<label for="custom_price" class="form-label">Price*</label>
+					<label for="custom_price" class="form-label">Price<small style="color: red;">*</small></label>
 					<input
 						type="text"
 						class="form-control bg-white"
@@ -195,7 +222,7 @@
 						/>
 				</div>
 				<div class="mb-4 mt-3 d-none custom_additional_cube">
-					<label for="custom_additional" class="form-label">Additional*</label>
+					<label for="custom_additional" class="form-label">Additional<small style="color: red;">*</small></label>
 					<textarea
 						name="custom_additional"
 						class="form-control bg-white"
@@ -204,7 +231,7 @@
 						id="custom_additional"></textarea>
 				</div>
 				<div class="mb-4 d-none icdx_code">
-					<label for="icdx" class="form-label">ICD10 Code*</label>
+					<label for="icdx" class="form-label">ICD10 Code<small style="color: red;">*</small></label>
 					<div id="icdx_cube">
 						<div class="icdx-row d-flex align-items-center" style="margin-bottom: 10px;">
 							<select class="form-select bg-white selecttwo-icdx" aria-label="Default select example" id="icdx" name="icdx_1">
@@ -224,7 +251,7 @@
 						</button>
 					</span>
 				</div>
-				<button type="submit" class="btn btn-primary w-100" id="">
+				<button type="submit" class="btn btn-primary w-100 mb-3">
 					Submit &nbsp;
 					<span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
 				</button>
@@ -238,18 +265,6 @@
 	let cptCounter = 1;
 	let icdxCounter = 1;
 	let cptDatax = @json($diagnosis);
-
-	const Toast = Swal.mixin({
-		toast: true,
-		position: "top-end",
-		showConfirmButton: false,
-		timer: 2000,
-		timerProgressBar: true,
-		didOpen: (toast) => {
-			toast.onmouseenter = Swal.stopTimer;
-			toast.onmouseleave = Swal.resumeTimer;
-		}
-	});
 
 	let isDraftButtonClicked;
 	$('#submit-new-invoice').on('click', function(event) {
@@ -281,13 +296,15 @@
 			loadingSpinner.removeClass('d-none');
     }
 
+		let cptDataxLocalStorage = JSON.parse(localStorage.getItem('dianosis')) || [];
+
 		setTimeout(() => {
 			$.ajax({
 				type: 'POST',
 				url: '{{ route("save_invoice_doctor") }}',
 				data: {
 					form: $(form).serialize(),
-					form2: JSON.stringify(cptDatax),
+					form2: JSON.stringify(cptDataxLocalStorage),
 					_token: $('meta[name="csrf-token"]').attr('content')
 				},
 				success: function(response) {
@@ -339,13 +356,16 @@
 		let infusionValue;
 		let infusionName;
 
+		infusionValue = '500000';
+
 		if (cpt === 3 || cpt === 4 || cpt === 5) {
 			infusionValue = $('#custom_price').val();
 			customAdditional = $('#custom_additional').val() || '';
 		} else if (cpt === 2) {
 			let infusionElement = $('#infusion');
 			let selectedOptionInf = infusionElement.find('option:selected');
-			infusionValue = infusionElement.val() || 0;
+
+			infusionValue = $('#infusion_custom_price').val();
 			infusionName = selectedOptionInf.data('desc');
 		}
 
@@ -374,7 +394,7 @@
 				}
 			});
 
-			cptDatax.push({
+			let dataDiagnosis = {
 				cpt_id: cptId,
 				cpt_code: diagnosisCode,
 				cpt_pax: pax,
@@ -383,14 +403,21 @@
 				cpt_infusion: infusionName,
 				cpt_additional: customAdditional,
 				cpt_icd: icdxData.length > 0 ? icdxData : []
-			});
+			};
+
+			let localStorageData = JSON.parse(localStorage.getItem('dianosis')) || [];
+
+			let existingIndex = localStorageData.findIndex(item => item.cpt_code === diagnosisCode);
+			if (existingIndex !== -1) {
+				localStorageData[existingIndex] = dataDiagnosis;
+			} else {
+				localStorageData.push(dataDiagnosis);
+			}
+
+			localStorage.setItem('dianosis', JSON.stringify(localStorageData));
+
+			listItemsSelected({ cptData: localStorageData });
     }
-
-    let formData = {
-      cptData: cptDatax
-    };
-
-    return JSON.stringify(formData);
 	};
 
 
@@ -401,10 +428,10 @@
 			let infusionName = cpt?.cpt_infusion ? `- ${cpt?.cpt_infusion}` : '';
 			let additionalReceipt = cpt?.cpt_additional ? `- ${cpt?.cpt_additional}` : '';
 			let cptHtml = `
-				<span class="fs-12">${cpt.cpt_code}</span>
+				<span class="fs-12 fw-semibold"></span>
 				<div class="d-flex align-items-center justify-content-between mb-2">
-						<div class="detail">
-							<h5>${cpt.cpt_desc}</h5>
+						<div class="detail" style="width: 350px;" onclick="openCanvas(this)" data-cpt-id="${cpt.cpt_id}">
+							<h5>(${cpt.cpt_code}) ${cpt.cpt_desc}</h5>
 							<span>${infusionName}</span>
 							<span>${additionalReceipt}</span>
 						</div>
@@ -420,7 +447,7 @@
 			$('.items-diagnosis').append(cptHtml);
 				cpt?.cpt_icd?.forEach((icd, icdIndex) => {
 					$('.items-diagnosis').append(`
-						<div class="d-flex align-items-center justify-content-between mb-2">
+						<div class="d-flex align-items-center justify-content-between mb-1" style="margin-left: 1rem;">
 								<div class="detail">
 									<h5>(${icd.icdx_code}) ${icd.icdx_desc}</h5>
 								</div>
@@ -434,17 +461,33 @@
 			});
     });
 
-		$('.btn-remove').on('click', function () {
+		$('.btn-remove').on('click', function (e) {
+			e.preventDefault();
+
 			const cptIndex = $(this).data('cpt-index');
 			const icdIndex = $(this).data('icd-index');
 
-			if (icdIndex !== undefined) {
-				cptDatax[cptIndex].cpt_icd.splice(icdIndex, 1);
-			} else {
-				cptDatax.splice(cptIndex, 1);
+			let localStorageData = JSON.parse(localStorage.getItem('dianosis')) || [];
+
+			if (cptIndex === 0) {
+				return;
 			}
 
-			listItemsSelected({ cptData: cptDatax });
+			if (cptIndex !== undefined) {
+        if (icdIndex !== undefined) {
+					localStorageData[cptIndex].cpt_icd.splice(icdIndex, 1);
+					localStorage.setItem('dianosis', JSON.stringify(localStorageData));
+
+					$(this).closest('.icd-item').remove();
+        } else {
+					localStorageData.splice(cptIndex, 1);
+					localStorage.setItem('dianosis', JSON.stringify(localStorageData));
+
+					$(this).closest('.cpt-item').remove();
+        }
+    	}
+
+			listItemsSelected({ cptData: localStorageData });
     });
 	};
 
@@ -454,18 +497,27 @@
     input.value = value;
 	}
 
+	const openCanvas = (element) => {
+		const offcanvasElement = $('#offcanvasDiagnosis');
+		const bsOffcanvas = new bootstrap.Offcanvas(offcanvasElement[0]);
+		const cptId = element.getAttribute('data-cpt-id');
+		resetFormPopup(cptId);
+		bsOffcanvas.show();
+	}
+
 	$('#formpopup').on('submit', function(e) {
 		e.preventDefault();
+
 		$('#offcanvasDiagnosis').offcanvas('hide');
-		let data = saveFormData();
-		let dataParse = JSON.parse(data);
-		listItemsSelected(dataParse);
+		saveFormData();
+
 		$(".selecttwo-icdx").html('');
 		resetFormPopup();
 	});
 
 	$('#add-new-icdx').click(function(e) {
 		e.preventDefault();
+
 		const newIcdxRow = getNewIcdxRow(icdxCounter);
 		$('#icdx_cube').append(newIcdxRow);
 
@@ -505,7 +557,9 @@
 
 	$('#icdx_cube').on('click', '.remove-btn-icdx', function(e) {
 		e.preventDefault();
+
 		const $cptRow = $(this).closest('.icdx-row');
+
 		if ($('#icdx_cube .icdx-row').length > 1) {
 			$cptRow.remove();
 		} else {
@@ -515,8 +569,11 @@
 
 	var resetFormPopup = () => {
 		let firstRowFound = false;
+		$('#formpopup')[0].reset();
+
 		$('#icdx_cube .icdx-row').each(function() {
 			let selectName = $(this).find('select').attr('name');
+
 			if (selectName === 'icdx_1') {
 				if (!firstRowFound) {
 					firstRowFound = true;
@@ -527,22 +584,13 @@
 				$(this).remove();
 			}
 		});
+
+		$('#cpt').val(cptId).trigger('change');
 	}
 
 	$('[href="#offcanvasDiagnosis"]').on('click', function() {
-		resetFormPopup();
+		resetFormPopup(1);
 	});
-
-	const defaultData = {
-		"cpt_id": "1",
-		"cpt_code": 99451,
-		"cpt_pax": "1",
-		"cpt_desc": "Konsultasi telehealth, evaluasi dan manajemen data medis jarak jauh. (konsultasi dokter)",
-		"cpt_price": "500000",
-		"cpt_infusion": "",
-		"cpt_additional": "",
-		"cpt_icd": []
-	};
 
 	function formatICDX(icdx) {
 		if (icdx.loading) {
@@ -573,7 +621,16 @@
 	}
 
 	$(document).ready(function () {
-		listItemsSelected({ cptData: cptDatax });
+		localStorage.removeItem('dianosis');
+
+		let localStorageData = JSON.parse(localStorage.getItem('dianosis')) || [];
+
+		if (localStorageData.length === 0) {
+			localStorage.setItem('dianosis', JSON.stringify(cptDatax));
+			localStorageData = cptDatax;
+		}
+
+		listItemsSelected({ cptData: localStorageData });
 
 		$('.selecttwo').select2({
 			dropdownParent: $("#offcanvasDiagnosis"),
@@ -633,13 +690,13 @@
 				phone_number: { required: true },
 				complimentary_discount: { required: false },
 				medical_team_transport_cost: { required: false },
-				payment_method: { required: true },
+				"payment_method[]": { required: true },
 			},
 			messages: {
 				username: { required: "Username required"},
 				address: { required: "Address required" },
 				phone_number: { required: "Phone number required" },
-				payment_method: { required: "Payment method required" },
+				"payment_method[]": { required: "Payment method required" },
 			},
 			submitHandler: submitNewInvoice
 		});
@@ -653,22 +710,33 @@
 			let selectedValue = $(this).val();
 			if (parseInt(selectedValue) === infusion) {
 				$('#cube_infusion').removeClass('d-none');
+				$('.infusion_custom_price').removeClass('d-none');
 				$('.icdx_code').removeClass('d-none');
 				$('.custom_additional_cube').addClass('d-none');
 			} else if (parseInt(selectedValue) === defaultOption) {
 				$('.icdx_code').addClass('d-none');
 				$('#cube_infusion').addClass('d-none');
 				$('.custom_additional_cube').addClass('d-none');
+				$('.infusion_custom_price').addClass('d-none');
 			} else if (parseInt(selectedValue) === additional1 || parseInt(selectedValue) === additional2 || parseInt(selectedValue) === additional3) {
 				$('.custom_additional_cube').removeClass('d-none');
 				$('#cube_infusion').addClass('d-none');
 				$('.icdx_code').removeClass('d-none');
+				$('.infusion_custom_price').addClass('d-none');
 			} else {
 				$('#cube_infusion').addClass('d-none');
 				$('.icdx_code').removeClass('d-none');
 				$('.custom_additional_cube').addClass('d-none');
+				$('.infusion_custom_price').addClass('d-none');
 			}
     });
+
+		$('#infusion').on('change', function() {
+			let input = this;
+			let value = input.value.replace(/[^0-9]/g, '');
+			value = new Intl.NumberFormat('id-ID').format(value);
+			$('#infusion_custom_price').val(value);
+		});
 
 		$('#payment_method').select2( {
 			width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
@@ -676,19 +744,17 @@
 			closeOnSelect: true,
 		});
 
+		$('#phone_number').on('input', function() {
+			let phoneNumber = $(this).val();
+			if (!phoneNumber.startsWith('62')) {
+				phoneNumber = '62' + phoneNumber.replace(/^0+/, '');
+				$(this).val(phoneNumber);
+			}
+		});
+
 		$('#service').select2();
 
 		var selectedMethods = {{ $paymentMethodSelected ?? [] }};
 		$('#payment_method').val(selectedMethods).trigger('change');
 	});
-
-	const defaultCpt = () => {
-		$.ajax({
-			type: 'GET',
-			url: '{{ route("get_default_cpt") }}',
-			success: function(response){
-				console.log(response);
-			},
-		});
-	}
 </script>

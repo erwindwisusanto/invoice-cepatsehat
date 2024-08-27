@@ -27,6 +27,7 @@
 						id="phone"
 						name="phone"
 						placeholder="6282111XXX"
+						pattern="62[0-9]{9,14}"
 						required
 						/>
 				</div>
@@ -188,6 +189,14 @@
 				}
 			},
 			submitHandler: submitSignUp
+		});
+
+		$('#phone').on('input', function() {
+			let phoneNumber = $(this).val();
+			if (!phoneNumber.startsWith('62')) {
+				phoneNumber = '62' + phoneNumber.replace(/^0+/, '');
+				$(this).val(phoneNumber);
+			}
 		});
 	});
 </script>

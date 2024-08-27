@@ -423,6 +423,7 @@ class InvoiceService
     $phoneNumber = $form['phone_number'] ?? null;
     $complimentaryDiscount = !empty($form['complimentary_discount']) ? str_replace('.','', $form['complimentary_discount']) : 0;
     $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? str_replace('.','', $form['medical_team_transport_cost']) : 0;
+		$costNightService = !empty($form['cost_night_service']) ? str_replace('.','', $form['cost_night_service']) : 0;
 		$invoiceId = decryptID($form['invoice_id']) ?? null;
 		$service = (int) $form['service'] ?? 0;
 
@@ -463,6 +464,7 @@ class InvoiceService
 				'phone' => $phoneNumber,
 				'complimentary_discount' => (int) $complimentaryDiscount,
 				'medical_team_transport_cost' => (int) $medicalTeamTransportCost,
+				'cost_night_service' => (int) $costNightService,
 				'payment_method' => $payment_methods_json,
 				'diagnosis' => $cpt_data_json,
 				'status' => $status,

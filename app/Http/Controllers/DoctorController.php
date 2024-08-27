@@ -52,6 +52,7 @@ class DoctorController extends Controller
 		$username = $invoice->username;
 		$invoiceId = encryptID($invoice->id);
 		$service_selected = (int) $invoice->service;
+		$costNightService = (int) $invoice->cost_night_service;
 
 		$paymentMethods = $this->invoiceService->ListPaymentMethod();
 		$infusions = $this->invoiceService->getInfusions();
@@ -74,7 +75,8 @@ class DoctorController extends Controller
 				'infusions',
 				'invoiceId',
 				'services',
-				'service_selected'
+				'service_selected',
+				'costNightService'
 				)
 		);
 	}
