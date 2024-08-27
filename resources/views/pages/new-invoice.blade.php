@@ -18,6 +18,7 @@
 				@method('POST')
 				@csrf
 				<input type="hidden" name="invoice_number" id="invoice_number" value="{{ $invoiceNumber }}">
+				<input type="hidden" name="uuid_invoice" id="uuid_invoice" value="{{ $UUID }}">
 				<div class="mb-4">
 					<label for="" class="form-label">Name<small style="color: red;">*</small></label>
 					<input
@@ -279,7 +280,7 @@
 		if (isDraftButtonClicked === "DRAFT") {
 			submitButtonDraft.prop('disabled', true);
 			submitButton.prop('disabled', true);
-			submitButtonDraft.addClass(disabledClass);
+			submitButtonDraft.addClass(disabledClass)
 			loadingSpinnerDraft.removeClass('d-none');
     } else {
 			submitButton.prop('disabled', true);

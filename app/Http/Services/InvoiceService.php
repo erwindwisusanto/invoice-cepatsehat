@@ -61,6 +61,11 @@ class InvoiceService
 
 	public function saveNewInvoice($form, $form2, $buttonType)
 	{
+		$dataLogs = [
+			'form_1' => $form,
+			'form_2' => $form2,
+		];
+
 		$username = $form['username'] ?? null;
     $address 	= $form['address'] ?? null;
     $phoneNumber = $form['phone_number'] ?? null;
@@ -68,6 +73,7 @@ class InvoiceService
     $medicalTeamTransportCost = !empty($form['medical_team_transport_cost']) ? str_replace('.','', $form['medical_team_transport_cost']) : 0;
     $costNightService = !empty($form['cost_night_service']) ? str_replace('.','', $form['cost_night_service']) : 0;
     $invoiceNumber = $form['invoice_number'] ?? null;
+    $UUID = $form['uuid_invoice'] ?? null;
 		$service = (int) $form['service'] ?? 0;
 
 		$statusDraft = 1;
@@ -96,8 +102,6 @@ class InvoiceService
 			}
     }
 
-		$uniqueNumbers = $this->getLatestUniqueNumber();
-
 		$payment_methods_json = json_encode($payment_methods);
     $cpt_data_json = json_encode($cpt_data);
 
@@ -116,7 +120,7 @@ class InvoiceService
 										'cost_night_service' => (int) $costNightService,
 										'payment_method' => $payment_methods_json,
 										'diagnosis' => $cpt_data_json,
-										'unique_invoice_number' => $uniqueNumbers,
+										'unique_invoice_number' => $UUID,
 										'status' => $status,
 										'service' => $service,
 										'created_at' => Carbon::now(),
@@ -124,11 +128,6 @@ class InvoiceService
 									]);
 
 			DB::commit();
-
-			$dataLogs = [
-				'form_1' => $form,
-				'form_2' => $form2,
-			];
 
 			Log::channel('user')->info('[INVOICE_NEW] [SUBMIT INVOICE SUCCESS] ['.auth()->user()->id.'] REQUEST ' . json_encode($dataLogs));
 
@@ -144,9 +143,12 @@ class InvoiceService
 				'message' => 'success create new invoice',
 				'isDraft' => $status,
 			];
+
 		} catch (\Exception $e) {
 			DB::rollBack();
+
 			Log::channel('user')->info('[INVOICE_NEW] [SUBMIT INVOICE FAILED] ['.auth()->user()->id.'] REQUEST ' . json_encode($dataLogs) . ' | ' . $e->getMessage());
+
 			return [
 				'success' => false,
 				'message' => $e->getMessage(),
@@ -280,6 +282,7 @@ class InvoiceService
 			$invoices = DB::table('invoice')->where('user_id', auth()->user()->id)->orderByDesc('created_at')->get();
 			foreach ($invoices as $invoice) {
 				$invoice->id = encryptId($invoice->id);
+				$invoice->updated_at = Carbon::parse($invoice->updated_at)->format('Y-m-d');
 			}
 			return $invoices;
 		} catch (\Exception $e) {

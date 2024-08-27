@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Str;
 
 class InvoiceController extends Controller
 {
@@ -35,9 +36,9 @@ class InvoiceController extends Controller
 		$year 					= date('Y');
 		$month 					= date('m');
 		$string 				= "CSI";
-		$dynamicNumber 	= $this->invoiceService->getLatestUniqueNumber();
+		$UUID 					= Str::uuid()->toString();
 
-		$invoiceNumber =  $dynamicNumber . '/'. $string .'/' . $month. '/' . $year;
+		$invoiceNumber =  $UUID . '/'. $string .'/' . $month. '/' . $year;
 		$date = date('d F Y');
 
 		$paymentMethods = $this->invoiceService->ListPaymentMethod();
@@ -45,7 +46,7 @@ class InvoiceController extends Controller
 		$infusions = $this->invoiceService->getInfusions();
 		$services = $this->invoiceService->ListServices();
 
-		return view('pages.new-invoice', compact('invoiceNumber', 'date', 'paymentMethods', 'cpts', 'infusions', 'services'));
+		return view('pages.new-invoice', compact('invoiceNumber', 'date', 'paymentMethods', 'cpts', 'infusions', 'services', 'UUID'));
 	}
 
 	public function createNewInvoice(Request $request)

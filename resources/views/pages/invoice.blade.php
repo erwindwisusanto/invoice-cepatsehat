@@ -17,6 +17,11 @@
 						<option value="3">Done</option>
 					</select>
 				</div>
+				<div class="col-6">
+					<div class="form-group">
+						<input type="text" class="form-control datepicker" id="datepicker" placeholder="Pick a date" style="background-color: #fff;">
+				</div>
+				</div>
 			</div>
 
 			<div class="input-group form-search mt-4">
@@ -51,6 +56,7 @@
 									<th>Name</th>
 									<th class="text-center">Status</th>
 									<th class="text-center d-none">Name</th>
+									<th class="text-center d-none">updated_at</th>
 								</tr>
 						</thead>
 						<tbody>
@@ -110,6 +116,10 @@
         </div>
 				<div class="d-flex justify-content-between mb-3 cost">
           <span class="fs-12 fw-semibold text-muted">Medical Team Transport Cost</span>
+          <p class="fs-14 mb-0"></p>
+        </div>
+				<div class="d-flex justify-content-between mb-3 ns_cost">
+          <span class="fs-12 fw-semibold text-muted">Nigh Service Cost</span>
           <p class="fs-14 mb-0"></p>
         </div>
         <div class="d-flex justify-content-between total-price">
@@ -196,7 +206,7 @@
 	}
 
 	$(document).ready(function () {
-		updateTable();
+		// updateTable();
 		const invoiceTable = $('#invoices').DataTable({
 			processing: false,
 			serverSide: true,
@@ -216,6 +226,10 @@
 				{
 					data: 'username',
 					name: 'username'
+				},
+				{
+					data: 'updated_at',
+					name: 'updated_at'
 				}
 			],columnDefs: [
 				{
@@ -225,7 +239,7 @@
 						const html = `
 							<div class="col-12">
 								<div class="row mb-1">
-									<span class="fs-12 text-muted">${formatingDate(full['created_at'])}</span> <span class='fs-12 text-muted' style='color: #494949;'>${full['invoice_number']}</span>
+									<span class="fs-12 text-muted">${formatingDate(full['created_at'])}</span> <span class='fs-12 text-muted' style='color: #494949;'>${full['invoice_number'].substring(30)}</span>
 								</div>
 								<h5 class='fs-14' style='color: #494949; font-weight: 600;'>${full['username']}</h5>
 							</div>
@@ -245,6 +259,13 @@
 					className: `align-middle text-center d-none`,
 					render: function(data, type, full, row) {
 						return statusInvoice(parseInt(data));
+					}
+				},
+				{
+					targets: 3,
+					className: `align-middle text-center d-none`,
+					render: function(data, type, full, row) {
+						return data;
 					}
 				}
 			],
@@ -267,6 +288,18 @@
 						invoiceTable.column(1).search(`^${selectedValue}$`, true, false).draw();
 					}
 				});
+
+				$('#datepicker').flatpickr({
+						dateFormat: "Y-m-d",
+						maxDate: "today",
+						onChange: function(selectedDates, dateStr, instance) {
+							if (dateStr) {
+								invoiceTable.column(3).search(dateStr).draw();
+							} else {
+								invoiceTable.column(3).search('').draw();
+							}
+						}
+				});
 			}
 		});
 
@@ -284,11 +317,12 @@
 			let invoiceId = rowData?.id;
 			let complimentaryDiscount = rowData?.complimentary_discount;
 			let medicalTeamTransportCost = rowData?.medical_team_transport_cost;
+			let costNightService = rowData?.cost_night_service;
 
 			var fixJson = rowData?.diagnosis.replace(/&quot;/g, '"');
 
 			$('#offcanvasDetailLabel').html(`
-				No Invoice: <a href="/invoice/${invoiceId}?view=8FxU0" target="_blank">${invoiceNumber}</a> ${statusInvoice(parseInt(status))}
+				No Invoice: <a href="/invoice/${invoiceId}?view=8FxU0" target="_blank">${invoiceNumber.substring(30)}</a> ${statusInvoice(parseInt(status))}
 				<p class="fs-12 text-muted mb-0">${formatingDate(date)}</p>
 			`);
 
@@ -341,11 +375,12 @@
 				.reduce((acc, pax) => acc + pax, 0);
 
 
-			let finalPrice = (totalPrice - complimentaryDiscount) + medicalTeamTransportCost;
+			let finalPrice = (totalPrice - complimentaryDiscount) + medicalTeamTransportCost + costNightService;
 
 			$('#offcanvasDetail .total-pax p').text(`${totalPax}x`);
 			$('#offcanvasDetail .compdisc p').text(formatter.format(complimentaryDiscount));
 			$('#offcanvasDetail .cost p').text(formatter.format(medicalTeamTransportCost));
+			$('#offcanvasDetail .ns_cost p').text(formatter.format(costNightService));
 			$('#offcanvasDetail .total-price p').text(formatter.format(finalPrice));
 
 			if (status === 1) {

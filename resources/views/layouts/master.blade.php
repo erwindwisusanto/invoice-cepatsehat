@@ -28,6 +28,9 @@
 		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
 
+		{{-- flatpicker --}}
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 		<link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.bootstrap5.css" />
 
@@ -47,6 +50,8 @@
 
 		<script src="{{ asset('assets/vendors/datatables.net/jquery.dataTables.js') }}"></script>
     <script src="{{ asset('assets/vendors/datatables.net-bs4/dataTables.bootstrap4.js') }}"></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 		<script src="{{ asset('assets/js/jquery.dataTables.js') }}"></script>
     <script src="{{ asset('assets/js/dataTables.bootstrap4.js') }}"></script>
